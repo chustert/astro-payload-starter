@@ -1,0 +1,211 @@
+---
+/**
+ * CTA2 Component (Organism)
+ *
+ * A two-column call-to-action section with content on one side
+ * and an image/media on the other. Great for visual CTAs.
+ *
+ * Naming: CTA2 follows Relume naming convention.
+ * - CTA1: Centered layout
+ * - CTA2: Two-column with image (this component)
+ * - CTA3: Would be CTA with background image
+ *
+ * @example
+ * <CTA2
+ *   heading="See It In Action"
+ *   description="Watch our demo video and discover the possibilities."
+ *   imageSrc="/images/demo.jpg"
+ *   imageAlt="Product demo"
+ * >
+ *   <Button variant="primary">Watch Demo</Button>
+ * </CTA2>
+ *
+ * @customization
+ * Override these CSS variables to customize:
+ * --cta2-gap, --cta2-heading-size, --cta2-max-width
+ */
+
+import Section from './Section.astro';
+
+interface Props {
+  /** Main heading text */
+  heading: string;
+  /** Description/subtitle text */
+  description?: string;
+  /** Image source URL */
+  imageSrc?: string;
+  /** Image alt text */
+  imageAlt?: string;
+  /** Reverse the layout (image on left) */
+  reverse?: boolean;
+  /** Background variant */
+  background?: 'default' | 'muted' | 'primary' | 'dark';
+  /** Section size (vertical padding) */
+  size?: 'sm' | 'md' | 'lg';
+  /** Override top padding */
+  paddingTop?: 'none' | 'sm' | 'md' | 'lg';
+  /** Override bottom padding */
+  paddingBottom?: 'none' | 'sm' | 'md' | 'lg';
+  /** Vertical alignment */
+  verticalAlign?: 'start' | 'center' | 'end';
+  /** Additional CSS classes */
+  class?: string;
+  [key: string]: any;
+}
+
+const {
+  heading,
+  description,
+  imageSrc,
+  imageAlt = '',
+  reverse = false,
+  background = 'muted',
+  size = 'md',
+  paddingTop,
+  paddingBottom,
+  verticalAlign = 'center',
+  class: className = '',
+  ...rest
+} = Astro.props;
+
+const hasMedia = Astro.slots.has('media') || imageSrc;
+
+// Build padding classes
+const paddingClasses = [
+  paddingTop && `padding-top-${paddingTop}`,
+  paddingBottom && `padding-bottom-${paddingBottom}`,
+].filter(Boolean).join(' ');
+
+const ctaClasses = [
+  'cta2',
+  reverse && 'cta2--reverse',
+  `cta2--align-${verticalAlign}`,
+  paddingClasses,
+  className,
+].filter(Boolean).join(' ');
+---
+
+<Section 
+  size={size} 
+  background={background}
+  class={ctaClasses}
+  {...rest}
+>
+  <div class="cta2_grid">
+    <div class="cta2_content">
+      <h2 class="cta2_heading">{heading}</h2>
+      {description && (
+        <p class="cta2_description">{description}</p>
+      )}
+      <div class="cta2_actions">
+        <slot />
+      </div>
+    </div>
+
+    {hasMedia && (
+      <div class="cta2_media">
+        {Astro.slots.has('media') ? (
+          <slot name="media" />
+        ) : imageSrc ? (
+          <img src={imageSrc} alt={imageAlt} class="cta2_image" />
+        ) : null}
+      </div>
+    )}
+  </div>
+</Section>
+
+<style>
+  /* Padding override classes */
+  .padding-top-none { padding-top: 0 !important; }
+  .padding-top-sm { padding-top: var(--padding-section-small) !important; }
+  .padding-top-md { padding-top: var(--padding-section-medium) !important; }
+  .padding-top-lg { padding-top: var(--padding-section-large) !important; }
+  
+  .padding-bottom-none { padding-bottom: 0 !important; }
+  .padding-bottom-sm { padding-bottom: var(--padding-section-small) !important; }
+  .padding-bottom-md { padding-bottom: var(--padding-section-medium) !important; }
+  .padding-bottom-lg { padding-bottom: var(--padding-section-large) !important; }
+
+  .cta2_grid {
+    display: grid;
+    gap: var(--cta2-gap, var(--space-12));
+  }
+
+  @media (min-width: 768px) {
+    .cta2_grid {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .cta2--reverse .cta2_content {
+      order: 2;
+    }
+
+    .cta2--reverse .cta2_media {
+      order: 1;
+    }
+  }
+
+  /* Vertical alignment */
+  .cta2--align-start .cta2_grid {
+    align-items: start;
+  }
+
+  .cta2--align-center .cta2_grid {
+    align-items: center;
+  }
+
+  .cta2--align-end .cta2_grid {
+    align-items: end;
+  }
+
+  /* Content styling */
+  .cta2_content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .cta2_heading {
+    font-family: var(--cta2-heading-font, var(--font-family-sans));
+    font-size: var(--cta2-heading-size, var(--text-size-h3));
+    font-weight: var(--cta2-heading-weight, var(--font-weight-bold));
+    line-height: var(--line-height-tight);
+    margin: 0;
+  }
+
+  .cta2_description {
+    font-size: var(--cta2-description-size, var(--text-size-medium));
+    line-height: var(--line-height-relaxed);
+    color: var(--cta2-description-color, var(--color-text-secondary));
+    margin: 0;
+  }
+
+  .cta2_actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    margin-top: var(--space-4);
+  }
+
+  /* Media styling */
+  .cta2_media {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .cta2_image,
+  .cta2_media :global(img),
+  .cta2_media :global(video) {
+    width: 100%;
+    height: auto;
+    border-radius: var(--cta2-image-radius, var(--radius-lg));
+    object-fit: cover;
+  }
+
+  /* Adjust colors for dark backgrounds */
+  :global(.section--bg-primary) .cta2_description,
+  :global(.section--bg-dark) .cta2_description {
+    color: var(--cta2-description-color-inverse, rgba(255, 255, 255, 0.8));
+  }
+</style>

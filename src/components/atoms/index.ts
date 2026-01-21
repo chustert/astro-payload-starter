@@ -10,7 +10,8 @@
 // Re-export all atom components for easy importing
 // Usage: import { Button, Input, Badge } from '@/components/atoms';
 
+export { default as Avatar } from './Avatar.astro';
+export { default as Badge } from './Badge.astro';
 export { default as Button } from './Button.astro';
 export { default as Input } from './Input.astro';
-export { default as Badge } from './Badge.astro';
 export { default as Text } from './Text.astro';

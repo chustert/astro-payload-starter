@@ -1,12 +1,15 @@
 ---
 /**
- * Header Component (Organism)
+ * Header1 Component (Organism)
  *
- * A site header with logo, navigation, and optional actions.
+ * Standard site header with logo, navigation, and optional actions.
  * Fully customizable through slots and CSS variables.
  *
+ * Naming: Header1 follows Relume naming convention for variants.
+ * Use Header2, Header3, etc. for different header layouts.
+ *
  * @example
- * <Header siteName="My Site">
+ * <Header1 siteName="My Site">
  *   <nav slot="nav">
  *     <NavLink href="/">Home</NavLink>
  *     <NavLink href="/about">About</NavLink>
@@ -14,11 +17,11 @@
  *   <div slot="actions">
  *     <Button>Sign In</Button>
  *   </div>
- * </Header>
+ * </Header1>
  *
  * @customization
  * Override these CSS variables to customize:
- * --header-bg, --header-height, --header-padding, --header-border-color
+ * --header1-bg, --header1-height, --header1-padding, --header1-border-color
  */
 
 interface Props {
@@ -51,34 +54,34 @@ const hasNav = Astro.slots.has('nav');
 const hasActions = Astro.slots.has('actions');
 
 const classes = [
-  'header',
-  sticky && 'header--sticky',
+  'header1',
+  sticky && 'header1--sticky',
   className,
 ].filter(Boolean).join(' ');
 ---
 
 <header class={classes} {...rest}>
-  <div class="header__container">
+  <div class="header1_container">
     <!-- Logo / Brand -->
-    <a href={homeHref} class="header__brand">
+    <a href={homeHref} class="header1_brand">
       {logoSrc ? (
-        <img src={logoSrc} alt={logoAlt} class="header__logo" />
+        <img src={logoSrc} alt={logoAlt} class="header1_logo" />
       ) : null}
       {siteName && (
-        <span class="header__site-name">{siteName}</span>
+        <span class="header1_site-name">{siteName}</span>
       )}
     </a>
 
     <!-- Navigation -->
     {hasNav && (
-      <nav class="header__nav">
+      <nav class="header1_nav">
         <slot name="nav" />
       </nav>
     )}
 
     <!-- Actions (buttons, etc.) -->
     {hasActions && (
-      <div class="header__actions">
+      <div class="header1_actions">
         <slot name="actions" />
       </div>
     )}
@@ -86,86 +89,86 @@ const classes = [
 </header>
 
 <style>
-  .header {
+  .header1 {
     width: 100%;
-    background-color: var(--header-bg, var(--color-bg-primary));
-    border-bottom: var(--header-border-width, 1px) solid
-                   var(--header-border-color, var(--color-border-default));
+    background-color: var(--header1-bg, var(--color-bg-primary));
+    border-bottom: var(--header1-border-width, 1px) solid
+                   var(--header1-border-color, var(--color-border-default));
   }
 
-  .header--sticky {
+  .header1--sticky {
     position: sticky;
     top: 0;
     z-index: var(--z-sticky);
-    backdrop-filter: var(--header-backdrop-filter, blur(8px));
-    background-color: var(--header-sticky-bg, rgba(255, 255, 255, 0.9));
+    backdrop-filter: var(--header1-backdrop-filter, blur(8px));
+    background-color: var(--header1-sticky-bg, rgba(255, 255, 255, 0.9));
   }
 
-  .header__container {
+  .header1_container {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: var(--header-gap, var(--space-6));
+    gap: var(--header1-gap, var(--space-6));
 
     max-width: var(--container-max-width);
     margin: 0 auto;
-    padding: var(--header-padding, var(--space-4) var(--container-padding));
-    min-height: var(--header-height, 64px);
+    padding: var(--header1-padding, var(--space-4) var(--container-padding));
+    min-height: var(--header1-height, 64px);
   }
 
   /* Brand / Logo */
-  .header__brand {
+  .header1_brand {
     display: flex;
     align-items: center;
-    gap: var(--header-brand-gap, var(--space-3));
+    gap: var(--header1-brand-gap, var(--space-3));
     text-decoration: none;
     color: inherit;
     flex-shrink: 0;
   }
 
-  .header__brand:focus-visible {
+  .header1_brand:focus-visible {
     outline: 2px solid var(--color-border-focus);
     outline-offset: 2px;
     border-radius: var(--radius-sm);
   }
 
-  .header__logo {
-    height: var(--header-logo-height, 32px);
+  .header1_logo {
+    height: var(--header1-logo-height, 32px);
     width: auto;
   }
 
-  .header__site-name {
-    font-family: var(--header-font-family, var(--font-family-sans));
-    font-size: var(--header-site-name-size, var(--font-size-xl));
-    font-weight: var(--header-site-name-weight, var(--font-weight-bold));
-    color: var(--header-site-name-color, var(--color-text-primary));
+  .header1_site-name {
+    font-family: var(--header1-font-family, var(--font-family-sans));
+    font-size: var(--header1-site-name-size, var(--font-size-xl));
+    font-weight: var(--header1-site-name-weight, var(--font-weight-bold));
+    color: var(--header1-site-name-color, var(--color-text-primary));
   }
 
   /* Navigation */
-  .header__nav {
+  .header1_nav {
     display: flex;
     align-items: center;
-    gap: var(--header-nav-gap, var(--space-1));
+    gap: var(--header1-nav-gap, var(--space-1));
   }
 
   /* Nav items layout (for child elements) */
-  .header__nav :global(a),
-  .header__nav :global(button) {
+  .header1_nav :global(a),
+  .header1_nav :global(button) {
     /* Allow NavLink styles to apply */
   }
 
   /* Actions */
-  .header__actions {
+  .header1_actions {
     display: flex;
     align-items: center;
-    gap: var(--header-actions-gap, var(--space-3));
+    gap: var(--header1-actions-gap, var(--space-3));
     flex-shrink: 0;
   }
 
   /* Responsive: Hide nav on mobile (implement hamburger menu as needed) */
   @media (max-width: 767px) {
-    .header__nav {
-      display: var(--header-nav-mobile-display, none);
+    .header1_nav {
+      display: var(--header1-nav-mobile-display, none);
     }
   }
 </style>

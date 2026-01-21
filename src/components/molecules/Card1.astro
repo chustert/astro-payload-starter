@@ -1,21 +1,26 @@
 ---
 /**
- * Card Component (Molecule)
+ * Card1 Component (Molecule)
  *
- * A flexible card container for grouping related content.
+ * A basic, flexible card container for grouping related content.
  * Uses slots for maximum flexibility in content arrangement.
  *
+ * Naming: Card1 follows Relume naming convention.
+ * - Card1: Basic card with slots (this component)
+ * - Card2: Would be card with image top
+ * - Card3: Would be horizontal card layout
+ *
  * @example
- * <Card>
+ * <Card1>
  *   <div slot="header">Card Header</div>
  *   <p>Card content goes here</p>
  *   <div slot="footer">Card Footer</div>
- * </Card>
+ * </Card1>
  *
  * @customization
  * Override these CSS variables to customize:
- * --card-bg, --card-padding, --card-border-radius
- * --card-shadow, --card-border-color, --card-border-width
+ * --card1-bg, --card1-padding, --card1-border-radius
+ * --card1-shadow, --card1-border-color, --card1-border-width
  */
 
 interface Props {
@@ -45,10 +50,10 @@ const isLink = !!href;
 const Element = isLink ? 'a' : 'article';
 
 const classes = [
-  'card',
-  `card--${variant}`,
-  noPadding && 'card--no-padding',
-  (interactive || isLink) && 'card--interactive',
+  'card1',
+  `card1--${variant}`,
+  noPadding && 'card1--no-padding',
+  (interactive || isLink) && 'card1--interactive',
   className,
 ].filter(Boolean).join(' ');
 
@@ -59,65 +64,65 @@ const hasMedia = Astro.slots.has('media');
 
 <Element class={classes} href={isLink ? href : undefined} {...rest}>
   {hasMedia && (
-    <div class="card__media">
+    <div class="card1_media">
       <slot name="media" />
     </div>
   )}
 
   {hasHeader && (
-    <div class="card__header">
+    <div class="card1_header">
       <slot name="header" />
     </div>
   )}
 
-  <div class="card__body">
+  <div class="card1_body">
     <slot />
   </div>
 
   {hasFooter && (
-    <div class="card__footer">
+    <div class="card1_footer">
       <slot name="footer" />
     </div>
   )}
 </Element>
 
 <style>
-  .card {
+  .card1 {
     display: flex;
     flex-direction: column;
     overflow: hidden;
 
     /* Shape */
-    border-radius: var(--card-border-radius, var(--radius-lg));
+    border-radius: var(--card1-border-radius, var(--radius-lg));
 
     /* Default padding */
-    --card-section-padding: var(--card-padding, var(--space-6));
+    --card1-section-padding: var(--card1-padding, var(--space-6));
   }
 
   /* ============================================
      Variant Styles
      ============================================ */
 
-  .card--elevated {
-    background-color: var(--card-elevated-bg, var(--color-bg-primary));
-    box-shadow: var(--card-elevated-shadow, var(--shadow-md));
+  .card1--elevated {
+    background-color: var(--card1-elevated-bg, var(--color-bg-primary));
+    box-shadow: var(--card1-elevated-shadow, var(--shadow-md));
   }
 
-  .card--outlined {
-    background-color: var(--card-outlined-bg, var(--color-bg-primary));
-    border: var(--card-border-width, 1px) solid
-            var(--card-border-color, var(--color-border-default));
+  .card1--outlined {
+    background-color: var(--card1-outlined-bg, var(--color-bg-primary));
+    border: var(--card1-border-width, 1px) solid
+            var(--card1-border-color, var(--color-border-default));
   }
 
-  .card--filled {
-    background-color: var(--card-filled-bg, var(--color-bg-secondary));
+  .card1--filled {
+    background-color: var(--card1-filled-bg, var(--color-bg-secondary));
   }
 
   /* ============================================
      Interactive State
      ============================================ */
 
-  .card--interactive {
+  .card1--interactive {
     cursor: pointer;
     transition:
       transform var(--transition-fast),
@@ -127,19 +132,19 @@ const hasMedia = Astro.slots.has('media');
     color: inherit;
   }
 
-  .card--interactive:hover {
-    transform: var(--card-hover-transform, translateY(-2px));
+  .card1--interactive:hover {
+    transform: var(--card1-hover-transform, translateY(-2px));
   }
 
-  .card--elevated.card--interactive:hover {
-    box-shadow: var(--card-hover-shadow, var(--shadow-lg));
+  .card1--elevated.card1--interactive:hover {
+    box-shadow: var(--card1-hover-shadow, var(--shadow-lg));
   }
 
-  .card--outlined.card--interactive:hover {
-    border-color: var(--card-hover-border-color, var(--color-border-strong));
+  .card1--outlined.card1--interactive:hover {
+    border-color: var(--card1-hover-border-color, var(--color-border-strong));
   }
 
-  .card--interactive:focus-visible {
+  .card1--interactive:focus-visible {
     outline: 2px solid var(--color-border-focus);
     outline-offset: 2px;
   }
@@ -148,29 +153,29 @@ const hasMedia = Astro.slots.has('media');
      Card Sections
      ============================================ */
 
-  .card__media {
+  .card1_media {
     /* Media slot has no padding by default */
   }
 
-  .card__media :global(img),
-  .card__media :global(video) {
+  .card1_media :global(img),
+  .card1_media :global(video) {
     width: 100%;
     height: auto;
     display: block;
   }
 
-  .card__header {
-    padding: var(--card-section-padding);
+  .card1_header {
+    padding: var(--card1-section-padding);
     padding-bottom: 0;
   }
 
-  .card__body {
-    padding: var(--card-section-padding);
+  .card1_body {
+    padding: var(--card1-section-padding);
     flex: 1;
   }
 
-  .card__footer {
-    padding: var(--card-section-padding);
+  .card1_footer {
+    padding: var(--card1-section-padding);
     padding-top: 0;
   }
 
@@ -178,11 +183,11 @@ const hasMedia = Astro.slots.has('media');
      Modifiers
      ============================================ */
 
-  .card--no-padding {
-    --card-section-padding: 0;
+  .card1--no-padding {
+    --card1-section-padding: 0;
   }
 
-  .card--no-padding .card__body {
-    padding: var(--card-padding, var(--space-6));
+  .card1--no-padding .card1_body {
+    padding: var(--card1-padding, var(--space-6));
   }
 </style>

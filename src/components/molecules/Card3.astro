@@ -1,0 +1,241 @@
+---
+/**
+ * Card3 Component (Molecule)
+ *
+ * A horizontal card with an image on one side and content on the other.
+ * Ideal for list items, featured content, or horizontal layouts.
+ *
+ * Naming: Card3 follows Relume naming convention.
+ * - Card1: Basic card with slots
+ * - Card2: Card with image top
+ * - Card3: Horizontal card layout (this component)
+ *
+ * @example
+ * <Card3
+ *   imageSrc="/images/feature.jpg"
+ *   imageAlt="Feature image"
+ *   title="Feature Title"
+ *   description="Feature description text."
+ * />
+ *
+ * @customization
+ * Override these CSS variables to customize:
+ * --card3-bg, --card3-padding, --card3-border-radius
+ * --card3-shadow, --card3-image-width
+ */
+
+interface Props {
+  /** Image source URL */
+  imageSrc?: string;
+  /** Image alt text */
+  imageAlt?: string;
+  /** Card title */
+  title?: string;
+  /** Card description */
+  description?: string;
+  /** Card style variant */
+  variant?: 'elevated' | 'outlined' | 'filled';
+  /** Reverse layout (image on right) */
+  reverse?: boolean;
+  /** Image width ratio (default 40%) */
+  imageWidth?: '30%' | '40%' | '50%';
+  /** Make card interactive (clickable) */
+  interactive?: boolean;
+  /** Link href (makes entire card clickable) */
+  href?: string;
+  /** Additional CSS classes */
+  class?: string;
+  [key: string]: any;
+}
+
+const {
+  imageSrc,
+  imageAlt = '',
+  title,
+  description,
+  variant = 'elevated',
+  reverse = false,
+  imageWidth = '40%',
+  interactive = false,
+  href,
+  class: className = '',
+  ...rest
+} = Astro.props;
+
+const isLink = !!href;
+const Element = isLink ? 'a' : 'article';
+
+const classes = [
+  'card3',
+  `card3--${variant}`,
+  reverse && 'card3--reverse',
+  (interactive || isLink) && 'card3--interactive',
+  className,
+].filter(Boolean).join(' ');
+
+const hasActions = Astro.slots.has('actions');
+const hasContent = Astro.slots.has('default');
+---
+
+<Element class={classes} href={isLink ? href : undefined} style={`--card3-image-width: ${imageWidth}`} {...rest}>
+  {imageSrc && (
+    <div class="card3_image-wrapper">
+      <img src={imageSrc} alt={imageAlt} class="card3_image" />
+    </div>
+  )}
+
+  <div class="card3_content">
+    {title && (
+      <h3 class="card3_title">{title}</h3>
+    )}
+    {description && (
+      <p class="card3_description">{description}</p>
+    )}
+    {hasContent && (
+      <div class="card3_body">
+        <slot />
+      </div>
+    )}
+    {hasActions && (
+      <div class="card3_actions">
+        <slot name="actions" />
+      </div>
+    )}
+  </div>
+</Element>
+
+<style>
+  .card3 {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border-radius: var(--card3-border-radius, var(--radius-lg));
+  }
+
+  @media (min-width: 640px) {
+    .card3 {
+      flex-direction: row;
+    }
+
+    .card3--reverse {
+      flex-direction: row-reverse;
+    }
+  }
+
+  /* ============================================
+     Variant Styles
+     ============================================ */
+
+  .card3--elevated {
+    background-color: var(--card3-elevated-bg, var(--color-bg-primary));
+    box-shadow: var(--card3-elevated-shadow, var(--shadow-md));
+  }
+
+  .card3--outlined {
+    background-color: var(--card3-outlined-bg, var(--color-bg-primary));
+    border: var(--card3-border-width, 1px) solid
+            var(--card3-border-color, var(--color-border-default));
+  }
+
+  .card3--filled {
+    background-color: var(--card3-filled-bg, var(--color-bg-secondary));
+  }
+
+  /* ============================================
+     Interactive State
+     ============================================ */
+
+  .card3--interactive {
+    cursor: pointer;
+    transition:
+      transform var(--transition-fast),
+      box-shadow var(--transition-fast),
+      border-color var(--transition-fast);
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .card3--interactive:hover {
+    transform: var(--card3-hover-transform, translateY(-2px));
+  }
+
+  .card3--elevated.card3--interactive:hover {
+    box-shadow: var(--card3-hover-shadow, var(--shadow-lg));
+  }
+
+  .card3--outlined.card3--interactive:hover {
+    border-color: var(--card3-hover-border-color, var(--color-border-strong));
+  }
+
+  .card3--interactive:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+
+  /* ============================================
+     Image
+     ============================================ */
+
+  .card3_image-wrapper {
+    overflow: hidden;
+    min-height: 200px;
+  }
+
+  @media (min-width: 640px) {
+    .card3_image-wrapper {
+      flex: 0 0 var(--card3-image-width, 40%);
+      min-height: auto;
+    }
+  }
+
+  .card3_image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--transition-normal);
+  }
+
+  .card3--interactive:hover .card3_image {
+    transform: scale(1.05);
+  }
+
+  /* ============================================
+     Content
+     ============================================ */
+
+  .card3_content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--card3-padding, var(--space-6));
+    flex: 1;
+    justify-content: center;
+  }
+
+  .card3_title {
+    font-family: var(--card3-title-font, var(--font-family-sans));
+    font-size: var(--card3-title-size, var(--text-size-h5));
+    font-weight: var(--card3-title-weight, var(--font-weight-semibold));
+    line-height: var(--line-height-tight);
+    margin: 0;
+    color: var(--card3-title-color, var(--color-text-primary));
+  }
+
+  .card3_description {
+    font-size: var(--card3-description-size, var(--text-size-small));
+    line-height: var(--line-height-relaxed);
+    color: var(--card3-description-color, var(--color-text-secondary));
+    margin: 0;
+  }
+
+  .card3_body {
+    margin-top: var(--space-2);
+  }
+
+  .card3_actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    margin-top: var(--space-4);
+  }
+</style>

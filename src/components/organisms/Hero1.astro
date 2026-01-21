@@ -1,0 +1,214 @@
+---
+/**
+ * Hero1 Component (Organism)
+ *
+ * A centered hero section for page headers. Supports tagline/badge,
+ * heading, description, and action buttons.
+ *
+ * Naming: Hero1 follows Relume naming convention.
+ * - Hero1: Centered layout (this component)
+ * - Hero2: Would be hero with side image
+ * - Hero3: Would be hero with video background
+ *
+ * @example
+ * <Hero1
+ *   tagline="Welcome"
+ *   heading="Build Something Amazing"
+ *   description="Start your project with our design system."
+ * >
+ *   <Button>Get Started</Button>
+ * </Hero1>
+ *
+ * @customization
+ * Override these CSS variables to customize:
+ * --hero1-padding, --hero1-max-width, --hero1-text-align
+ */
+
+import Section from './Section.astro';
+import Badge from '@atoms/Badge.astro';
+
+interface Props {
+  /** Small tagline text above heading (renders as Badge) */
+  tagline?: string;
+  /** Main heading text */
+  heading: string;
+  /** Description/subtitle text */
+  description?: string;
+  /** Text alignment */
+  align?: 'left' | 'center';
+  /** Section size (vertical padding) */
+  size?: 'sm' | 'md' | 'lg';
+  /** Override top padding */
+  paddingTop?: 'none' | 'sm' | 'md' | 'lg';
+  /** Override bottom padding */
+  paddingBottom?: 'none' | 'sm' | 'md' | 'lg';
+  /** Background variant */
+  background?: 'default' | 'muted' | 'primary' | 'dark';
+  /** Maximum width for text content */
+  contentWidth?: 'narrow' | 'medium' | 'wide';
+  /** Additional CSS classes */
+  class?: string;
+  [key: string]: any;
+}
+
+const {
+  tagline,
+  heading,
+  description,
+  align = 'center',
+  size = 'lg',
+  paddingTop,
+  paddingBottom,
+  background = 'default',
+  contentWidth = 'medium',
+  class: className = '',
+  ...rest
+} = Astro.props;
+
+const hasActions = Astro.slots.has('default');
+const hasMedia = Astro.slots.has('media');
+
+const contentWidthMap = {
+  narrow: '45ch',
+  medium: '55ch',
+  wide: '65ch',
+};
+
+// Build padding classes
+const paddingClasses = [
+  paddingTop && `padding-top-${paddingTop}`,
+  paddingBottom && `padding-bottom-${paddingBottom}`,
+].filter(Boolean).join(' ');
+
+const heroClasses = [
+  'hero1',
+  `hero1--${align}`,
+  hasMedia && 'hero1--with-media',
+  paddingClasses,
+  className,
+].filter(Boolean).join(' ');
+---
+
+<Section 
+  size={size} 
+  background={background} 
+  centerHeading={align === 'center'}
+  class={heroClasses}
+  {...rest}
+>
+  <div slot="header" class="hero1_content" style={`--hero1-content-width: ${contentWidthMap[contentWidth]}`}>
+    {tagline && (
+      <Badge variant="primary" class="hero1_tagline">{tagline}</Badge>
+    )}
+    <h1 class="hero1_heading" set:html={heading} />
+    {description && (
+      <p class="hero1_description">{description}</p>
+    )}
+    {hasActions && (
+      <div class="hero1_actions">
+        <slot />
+      </div>
+    )}
+  </div>
+
+  {hasMedia && (
+    <div class="hero1_media">
+      <slot name="media" />
+    </div>
+  )}
+</Section>
+
+<style>
+  /* Padding override classes */
+  .padding-top-none { padding-top: 0 !important; }
+  .padding-top-sm { padding-top: var(--padding-section-small) !important; }
+  .padding-top-md { padding-top: var(--padding-section-medium) !important; }
+  .padding-top-lg { padding-top: var(--padding-section-large) !important; }
+  
+  .padding-bottom-none { padding-bottom: 0 !important; }
+  .padding-bottom-sm { padding-bottom: var(--padding-section-small) !important; }
+  .padding-bottom-md { padding-bottom: var(--padding-section-medium) !important; }
+  .padding-bottom-lg { padding-bottom: var(--padding-section-large) !important; }
+
+  .hero1_content {
+    max-width: var(--hero1-content-width, 55ch);
+  }
+
+  .hero1--center .hero1_content {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+  }
+
+  .hero1--left .hero1_content {
+    text-align: left;
+  }
+
+  .hero1_tagline {
+    margin-bottom: var(--space-4);
+  }
+
+  .hero1_heading {
+    font-family: var(--hero1-heading-font, var(--font-family-sans));
+    font-size: var(--hero1-heading-size, var(--text-size-h1));
+    font-weight: var(--hero1-heading-weight, var(--font-weight-bold));
+    line-height: var(--hero1-heading-line-height, var(--line-height-tight));
+    letter-spacing: var(--hero1-heading-letter-spacing, var(--letter-spacing-tight));
+    margin: 0 0 var(--space-4) 0;
+  }
+
+  .hero1_description {
+    font-size: var(--hero1-description-size, var(--text-size-large));
+    line-height: var(--hero1-description-line-height, var(--line-height-relaxed));
+    color: var(--hero1-description-color, var(--color-text-secondary));
+    margin: 0;
+    max-width: var(--hero1-content-width, 55ch);
+  }
+
+  .hero1--center .hero1_description {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* Adjust colors for dark backgrounds */
+  :global(.section--bg-primary) .hero1_description,
+  :global(.section--bg-dark) .hero1_description {
+    color: var(--hero1-description-color-inverse, rgba(255, 255, 255, 0.8));
+  }
+
+  .hero1_actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    margin-top: var(--space-8);
+  }
+
+  .hero1--center .hero1_actions {
+    justify-content: center;
+  }
+
+  .hero1_media {
+    margin-top: var(--space-12);
+  }
+
+  .hero1_media :global(img),
+  .hero1_media :global(video) {
+    width: 100%;
+    height: auto;
+    border-radius: var(--radius-lg);
+  }
+
+  /* Two-column layout when media is present */
+  @media (min-width: 768px) {
+    .hero1--with-media :global(.section__content) {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-12);
+      align-items: center;
+    }
+
+    .hero1--with-media .hero1_media {
+      margin-top: 0;
+    }
+  }
+</style>

@@ -1,0 +1,208 @@
+---
+/**
+ * Feature1 Component (Organism)
+ *
+ * Displays a grid of feature/value cards with icons. Versatile component
+ * for features, values, services, or benefits sections.
+ *
+ * Naming: Feature1 follows Relume naming convention.
+ * - Feature1: Card grid layout (this component)
+ * - Feature2: Would be alternating row layout
+ * - Feature3: Would be single feature highlight
+ *
+ * @example
+ * <Feature1
+ *   title="Our Features"
+ *   features={[
+ *     { icon: '✦', title: 'Fast', description: 'Lightning quick.' },
+ *     { icon: '◈', title: 'Secure', description: 'Built-in security.' },
+ *   ]}
+ * />
+ *
+ * @customization
+ * Override these CSS variables to customize:
+ * --feature1-card-padding, --feature1-icon-size, --feature1-gap
+ */
+
+import Section from './Section.astro';
+import Card1 from '@molecules/Card1.astro';
+
+interface Feature {
+  /** Icon (emoji, character, or HTML) */
+  icon?: string;
+  /** Feature title */
+  title: string;
+  /** Feature description */
+  description: string;
+}
+
+interface Props {
+  /** Section title */
+  title?: string;
+  /** Section subtitle */
+  subtitle?: string;
+  /** Array of features to display */
+  features: Feature[];
+  /** Number of columns (2, 3, or 4) */
+  columns?: 2 | 3 | 4;
+  /** Card style variant */
+  cardVariant?: 'elevated' | 'outlined' | 'filled';
+  /** Section size (vertical padding) */
+  size?: 'sm' | 'md' | 'lg';
+  /** Override top padding */
+  paddingTop?: 'none' | 'sm' | 'md' | 'lg';
+  /** Override bottom padding */
+  paddingBottom?: 'none' | 'sm' | 'md' | 'lg';
+  /** Background variant */
+  background?: 'default' | 'muted' | 'primary' | 'dark';
+  /** Center the section heading */
+  centerHeading?: boolean;
+  /** Center card content */
+  centerCards?: boolean;
+  /** Additional CSS classes */
+  class?: string;
+  [key: string]: any;
+}
+
+const {
+  title,
+  subtitle,
+  features,
+  columns = 3,
+  cardVariant = 'outlined',
+  size = 'md',
+  paddingTop,
+  paddingBottom,
+  background = 'default',
+  centerHeading = true,
+  centerCards = true,
+  class: className = '',
+  ...rest
+} = Astro.props;
+
+// Build padding classes
+const paddingClasses = [
+  paddingTop && `padding-top-${paddingTop}`,
+  paddingBottom && `padding-bottom-${paddingBottom}`,
+].filter(Boolean).join(' ');
+
+const gridClass = [
+  'feature1_grid',
+  `feature1_grid--cols-${columns}`,
+].join(' ');
+
+const cardClass = centerCards ? 'feature1_card feature1_card--centered' : 'feature1_card';
+
+const sectionClasses = [
+  'feature1',
+  paddingClasses,
+  className,
+].filter(Boolean).join(' ');
+---
+
+<Section 
+  title={title}
+  subtitle={subtitle}
+  size={size} 
+  background={background}
+  centerHeading={centerHeading}
+  class={sectionClasses}
+  {...rest}
+>
+  <div class={gridClass}>
+    {features.map((feature) => (
+      <Card1 variant={cardVariant} class={cardClass}>
+        {feature.icon && (
+          <div class="feature1_icon" set:html={feature.icon} />
+        )}
+        <h3 class="feature1_title">{feature.title}</h3>
+        <p class="feature1_description">{feature.description}</p>
+      </Card1>
+    ))}
+  </div>
+  
+  <!-- Slot for additional content below the grid -->
+  <slot />
+</Section>
+
+<style>
+  /* Padding override classes */
+  .padding-top-none { padding-top: 0 !important; }
+  .padding-top-sm { padding-top: var(--padding-section-small) !important; }
+  .padding-top-md { padding-top: var(--padding-section-medium) !important; }
+  .padding-top-lg { padding-top: var(--padding-section-large) !important; }
+  
+  .padding-bottom-none { padding-bottom: 0 !important; }
+  .padding-bottom-sm { padding-bottom: var(--padding-section-small) !important; }
+  .padding-bottom-md { padding-bottom: var(--padding-section-medium) !important; }
+  .padding-bottom-lg { padding-bottom: var(--padding-section-large) !important; }
+
+  .feature1_grid {
+    display: grid;
+    gap: var(--feature1-gap, var(--space-6));
+  }
+
+  .feature1_grid--cols-2 {
+    grid-template-columns: repeat(1, 1fr);
+  }
+
+  .feature1_grid--cols-3 {
+    grid-template-columns: repeat(1, 1fr);
+  }
+
+  .feature1_grid--cols-4 {
+    grid-template-columns: repeat(1, 1fr);
+  }
+
+  @media (min-width: 640px) {
+    .feature1_grid--cols-2,
+    .feature1_grid--cols-3,
+    .feature1_grid--cols-4 {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .feature1_grid--cols-3 {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .feature1_grid--cols-4 {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  .feature1_card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .feature1_card--centered {
+    text-align: center;
+    align-items: center;
+  }
+
+  .feature1_icon {
+    font-size: var(--feature1-icon-size, 2rem);
+    line-height: 1;
+    margin-bottom: var(--space-2);
+    color: var(--feature1-icon-color, var(--color-accent));
+  }
+
+  .feature1_title {
+    font-family: var(--feature1-title-font, var(--font-family-sans));
+    font-size: var(--feature1-title-size, var(--text-size-h5));
+    font-weight: var(--feature1-title-weight, var(--font-weight-semibold));
+    line-height: var(--line-height-tight);
+    margin: 0 0 var(--space-2) 0;
+    color: var(--feature1-title-color, var(--color-text-primary));
+  }
+
+  .feature1_description {
+    font-size: var(--feature1-description-size, var(--text-size-small));
+    line-height: var(--line-height-relaxed);
+    color: var(--feature1-description-color, var(--color-text-secondary));
+    margin: 0;
+  }
+</style>

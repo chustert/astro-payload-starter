@@ -1,0 +1,209 @@
+---
+/**
+ * Layout1 Component (Organism)
+ *
+ * A two-column section with content on one side and media (image, video, card)
+ * on the other. Supports reversible layout.
+ *
+ * Naming: Layout1 follows Relume naming convention.
+ * - Layout1: Two-column with media (this component)
+ * - Layout2: Would be content-only two-column
+ * - Layout3: Would be three-column layout
+ *
+ * @example
+ * <Layout1
+ *   tagline="Our Story"
+ *   heading="Started with a Simple Idea"
+ *   description="We founded our company with a clear mission."
+ * >
+ *   <img slot="media" src="/image.jpg" alt="Story" />
+ * </Layout1>
+ *
+ * @customization
+ * Override these CSS variables to customize:
+ * --layout1-gap, --layout1-content-max-width
+ */
+
+import Section from './Section.astro';
+import Badge from '@atoms/Badge.astro';
+
+interface Props {
+  /** Small tagline text (renders as Badge) */
+  tagline?: string;
+  /** Main heading text */
+  heading: string;
+  /** Primary description text */
+  description?: string;
+  /** Reverse the layout (media on left) */
+  reverse?: boolean;
+  /** Vertical alignment */
+  verticalAlign?: 'start' | 'center' | 'end';
+  /** Section size (vertical padding) */
+  size?: 'sm' | 'md' | 'lg';
+  /** Override top padding */
+  paddingTop?: 'none' | 'sm' | 'md' | 'lg';
+  /** Override bottom padding */
+  paddingBottom?: 'none' | 'sm' | 'md' | 'lg';
+  /** Background variant */
+  background?: 'default' | 'muted' | 'primary' | 'dark';
+  /** Additional CSS classes */
+  class?: string;
+  [key: string]: any;
+}
+
+const {
+  tagline,
+  heading,
+  description,
+  reverse = false,
+  verticalAlign = 'center',
+  size = 'md',
+  paddingTop,
+  paddingBottom,
+  background = 'default',
+  class: className = '',
+  ...rest
+} = Astro.props;
+
+const hasMedia = Astro.slots.has('media');
+const hasContent = Astro.slots.has('default');
+
+// Build padding classes
+const paddingClasses = [
+  paddingTop && `padding-top-${paddingTop}`,
+  paddingBottom && `padding-bottom-${paddingBottom}`,
+].filter(Boolean).join(' ');
+
+const layoutClasses = [
+  'layout1',
+  reverse && 'layout1--reverse',
+  `layout1--align-${verticalAlign}`,
+  paddingClasses,
+  className,
+].filter(Boolean).join(' ');
+---
+
+<Section 
+  size={size} 
+  background={background}
+  class={layoutClasses}
+  {...rest}
+>
+  <div class="layout1_grid">
+    <div class="layout1_content">
+      {tagline && (
+        <Badge class="layout1_tagline">{tagline}</Badge>
+      )}
+      <h2 class="layout1_heading">{heading}</h2>
+      {description && (
+        <p class="layout1_description">{description}</p>
+      )}
+      {hasContent && (
+        <div class="layout1_body">
+          <slot />
+        </div>
+      )}
+    </div>
+
+    {hasMedia && (
+      <div class="layout1_media">
+        <slot name="media" />
+      </div>
+    )}
+  </div>
+</Section>
+
+<style>
+  /* Padding override classes */
+  .padding-top-none { padding-top: 0 !important; }
+  .padding-top-sm { padding-top: var(--padding-section-small) !important; }
+  .padding-top-md { padding-top: var(--padding-section-medium) !important; }
+  .padding-top-lg { padding-top: var(--padding-section-large) !important; }
+  
+  .padding-bottom-none { padding-bottom: 0 !important; }
+  .padding-bottom-sm { padding-bottom: var(--padding-section-small) !important; }
+  .padding-bottom-md { padding-bottom: var(--padding-section-medium) !important; }
+  .padding-bottom-lg { padding-bottom: var(--padding-section-large) !important; }
+
+  .layout1_grid {
+    display: grid;
+    gap: var(--layout1-gap, var(--space-12));
+  }
+
+  @media (min-width: 768px) {
+    .layout1_grid {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .layout1--reverse .layout1_content {
+      order: 2;
+    }
+
+    .layout1--reverse .layout1_media {
+      order: 1;
+    }
+  }
+
+  /* Vertical alignment */
+  .layout1--align-start .layout1_grid {
+    align-items: start;
+  }
+
+  .layout1--align-center .layout1_grid {
+    align-items: center;
+  }
+
+  .layout1--align-end .layout1_grid {
+    align-items: end;
+  }
+
+  /* Content styling */
+  .layout1_content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .layout1_tagline {
+    width: fit-content;
+  }
+
+  .layout1_heading {
+    font-family: var(--layout1-heading-font, var(--font-family-sans));
+    font-size: var(--layout1-heading-size, var(--text-size-h2));
+    font-weight: var(--layout1-heading-weight, var(--font-weight-bold));
+    line-height: var(--line-height-tight);
+    margin: 0;
+  }
+
+  .layout1_description {
+    font-size: var(--layout1-description-size, var(--text-size-medium));
+    line-height: var(--line-height-relaxed);
+    color: var(--layout1-description-color, var(--color-text-secondary));
+    margin: 0;
+  }
+
+  .layout1_body {
+    margin-top: var(--space-2);
+  }
+
+  /* Media styling */
+  .layout1_media {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .layout1_media :global(img),
+  .layout1_media :global(video) {
+    width: 100%;
+    height: auto;
+    border-radius: var(--radius-lg);
+  }
+
+  /* Adjust colors for dark backgrounds */
+  :global(.section--bg-primary) .layout1_description,
+  :global(.section--bg-dark) .layout1_description {
+    color: var(--layout1-description-color-inverse, rgba(255, 255, 255, 0.8));
+  }
+</style>

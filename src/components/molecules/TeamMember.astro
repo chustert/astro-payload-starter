@@ -1,0 +1,135 @@
+---
+/**
+ * TeamMember Component (Molecule)
+ *
+ * Displays a team member card with avatar, name, role, and optional bio.
+ * Combines Avatar atom with text elements.
+ *
+ * @example
+ * <TeamMember 
+ *   name="Jane Doe"
+ *   role="CEO & Founder"
+ *   image="/images/jane.jpg"
+ *   bio="Jane leads our team with 10+ years of experience."
+ * />
+ *
+ * @customization
+ * Override these CSS variables to customize:
+ * --team-member-gap, --team-member-text-align
+ */
+
+import Avatar from '@atoms/Avatar.astro';
+
+interface Props {
+  /** Team member name */
+  name: string;
+  /** Team member role/title */
+  role: string;
+  /** Avatar image URL */
+  image?: string;
+  /** Short bio or description */
+  bio?: string;
+  /** Avatar size */
+  avatarSize?: 'md' | 'lg' | 'xl';
+  /** Layout alignment */
+  align?: 'left' | 'center';
+  /** Additional CSS classes */
+  class?: string;
+  [key: string]: any;
+}
+
+const {
+  name,
+  role,
+  image,
+  bio,
+  avatarSize = 'xl',
+  align = 'center',
+  class: className = '',
+  ...rest
+} = Astro.props;
+
+const classes = [
+  'team-member',
+  `team-member--${align}`,
+  className,
+].filter(Boolean).join(' ');
+---
+
+<article class={classes} {...rest}>
+  <Avatar 
+    src={image} 
+    alt={name} 
+    size={avatarSize}
+    class="team-member__avatar"
+  />
+  <div class="team-member__info">
+    <h3 class="team-member__name">{name}</h3>
+    <p class="team-member__role">{role}</p>
+    {bio && <p class="team-member__bio">{bio}</p>}
+  </div>
+  <slot />
+</article>
+
+<style>
+  .team-member {
+    display: flex;
+    flex-direction: column;
+    gap: var(--team-member-gap, var(--space-4));
+  }
+
+  /* ============================================
+     Alignment Variants
+     ============================================ */
+
+  .team-member--center {
+    align-items: center;
+    text-align: center;
+  }
+
+  .team-member--left {
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  /* ============================================
+     Elements
+     ============================================ */
+
+  .team-member__avatar {
+    margin-bottom: var(--space-2);
+  }
+
+  .team-member__info {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+
+  .team-member__name {
+    font-family: var(--team-member-name-font, var(--font-family-sans));
+    font-size: var(--team-member-name-size, var(--text-size-h6));
+    font-weight: var(--team-member-name-weight, var(--font-weight-semibold));
+    line-height: var(--line-height-tight);
+    margin: 0;
+    color: var(--team-member-name-color, var(--color-text-primary));
+  }
+
+  .team-member__role {
+    font-size: var(--team-member-role-size, var(--text-size-small));
+    color: var(--team-member-role-color, var(--color-text-secondary));
+    margin: 0;
+  }
+
+  .team-member__bio {
+    font-size: var(--team-member-bio-size, var(--text-size-small));
+    color: var(--team-member-bio-color, var(--color-text-secondary));
+    margin: var(--space-2) 0 0 0;
+    max-width: 30ch;
+  }
+
+  .team-member--center .team-member__bio {
+    margin-left: auto;
+    margin-right: auto;
+  }
+</style>

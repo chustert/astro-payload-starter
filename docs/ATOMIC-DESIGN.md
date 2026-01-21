@@ -1,6 +1,6 @@
 # Atomic Design in This Project
 
-This document explains how the atomic design methodology is applied in this Astro starter template.
+This document explains how the atomic design methodology is applied in this Astro starter template, including the Relume-aligned naming convention.
 
 ## What is Atomic Design?
 
@@ -13,6 +13,62 @@ Atomic Design is a methodology for creating design systems, introduced by Brad F
 5. **Pages** - Specific instances of templates
 
 This project uses four levels (atoms through templates), with pages handled by Astro's built-in routing.
+
+---
+
+## Naming Convention (Relume-Aligned)
+
+This project follows a naming convention aligned with the Relume Figma Kit for seamless Figma-to-code workflow.
+
+### Core Principle: Numbers vs Props
+
+```
+Numbers = Different STRUCTURE (different HTML/layout)
+Props   = Different CONFIGURATION (same structure, different styling)
+```
+
+### When to Create a NEW Numbered Variant
+
+- Different HTML structure
+- Different visual layout (centered vs split)
+- Different content arrangement
+
+### When to Use PROPS on Existing Component
+
+- Padding/spacing variations
+- Background color changes
+- Alignment options
+- Container width
+
+### Naming Rules by Level
+
+| Level | Convention | Example |
+|-------|------------|---------|
+| **Atoms** | Base name + variant props | `Button variant="primary"` |
+| **Molecules** | `{Type}{Number}` | `Card1`, `Card2`, `Card3` |
+| **Organisms** | `{Category}{Number}` | `Header1`, `Hero1`, `CTA1` |
+
+### CSS Class Naming
+
+Pattern: `{category}{number}_{element}`
+
+```css
+/* Hero1 - Centered layout */
+.hero1_content { }
+.hero1_heading { }
+.hero1_description { }
+.hero1_actions { }
+
+/* Hero2 - With side image */
+.hero2_grid { }
+.hero2_content { }
+.hero2_image-wrapper { }
+
+/* Card molecules */
+.card1_image { }
+.card1_content { }
+.card2_image-wrapper { }
+```
 
 ---
 
@@ -29,6 +85,7 @@ Atoms are the smallest, most fundamental components. They cannot be broken down 
 - No child components (other than slot content)
 - Highly reusable
 - Style-agnostic (customizable via CSS variables)
+- **No numbered variants** - use props for variations
 
 **Current Atoms:**
 | Component | Purpose |
@@ -37,16 +94,7 @@ Atoms are the smallest, most fundamental components. They cannot be broken down 
 | `Input` | Text input and textarea |
 | `Badge` | Status label or tag |
 | `Text` | Typography wrapper |
-
-**Examples of potential atoms:**
-- `Icon` - SVG icon wrapper
-- `Avatar` - User profile image
-- `Checkbox` - Form checkbox
-- `Radio` - Form radio button
-- `Toggle` - On/off switch
-- `Spinner` - Loading indicator
-- `Divider` - Horizontal rule
-- `Image` - Responsive image
+| `Avatar` | User profile image |
 
 ### Molecules
 
@@ -58,24 +106,17 @@ Molecules are simple combinations of atoms that work together as a unit. They ha
 - Combines 2-3 atoms
 - Single responsibility
 - Self-contained
-- Commonly reused patterns
+- **Numbered variants for structural differences**
 
 **Current Molecules:**
-| Component | Composition | Purpose |
+| Component | Description | Purpose |
 |-----------|-------------|---------|
-| `Card` | Container + slots | Content grouping |
+| `Card1` | Basic card with slots | Flexible content grouping |
+| `Card2` | Card with image at top | Blog posts, products |
+| `Card3` | Horizontal card layout | List items, featured content |
 | `FormField` | Label + Input + helper | Complete form field |
 | `NavLink` | Link with active detection | Navigation item |
-
-**Examples of potential molecules:**
-- `SearchInput` - Input + Button + Icon
-- `MediaObject` - Image + Text content
-- `Stat` - Label + Value + Change indicator
-- `Breadcrumb` - Series of links
-- `Pagination` - Page navigation
-- `Toast` - Notification message
-- `Modal` - Dialog container
-- `Dropdown` - Trigger + Menu
+| `TeamMember` | Avatar + Name + Role | Team displays |
 
 ### Organisms
 
@@ -88,23 +129,58 @@ Organisms are complex UI components composed of atoms, molecules, and/or other o
 - Self-contained sections
 - Often context-aware
 - Page-section level
+- **Always use numbered variants** (aligned with Relume)
 
 **Current Organisms:**
-| Component | Composition | Purpose |
+| Component | Description | Purpose |
 |-----------|-------------|---------|
-| `Header` | Logo + NavLinks + Buttons | Site header |
-| `Footer` | Copyright + NavLinks + Social | Site footer |
-| `Section` | Title + Content container | Page section |
+| `Header1` | Standard navigation header | Site header |
+| `Footer1` | Standard site footer | Copyright, links, social |
+| `Section` | Base section wrapper | Generic sections |
+| `Hero1` | Centered hero section | Page headers |
+| `Feature1` | Card grid section | Features, values, services |
+| `Stats1` | Statistics grid | Achievements, metrics |
+| `Team1` | Team member grid | About pages |
+| `Layout1` | Two-column content + media | Story sections |
+| `CTA1` | Centered call-to-action | Conversion sections |
+| `CTA2` | Two-column CTA with image | Visual CTAs |
 
-**Examples of potential organisms:**
-- `Hero` - Headline + Subhead + CTAs + Image
-- `FeatureGrid` - Section + Cards
-- `Testimonials` - Section + Quotes
-- `PricingTable` - Cards with pricing
-- `ContactForm` - Form fields + Button
-- `Newsletter` - Input + Button + Text
-- `Sidebar` - Navigation + Widgets
-- `ArticleCard` - Card with image, meta, excerpt
+### Standard Props for Section Organisms
+
+All section organisms accept these configuration props:
+
+```typescript
+interface SectionProps {
+  // Padding control
+  size?: 'sm' | 'md' | 'lg';               // Overall padding
+  paddingTop?: 'none' | 'sm' | 'md' | 'lg';    // Override top
+  paddingBottom?: 'none' | 'sm' | 'md' | 'lg'; // Override bottom
+  
+  // Background
+  background?: 'default' | 'muted' | 'primary' | 'dark';
+  
+  // Container
+  contained?: boolean;
+  containerWidth?: 'small' | 'medium' | 'large' | 'full';
+}
+```
+
+**Example Usage:**
+```astro
+<!-- Same Hero1 component, different configurations -->
+<Hero1 
+  heading="Welcome"
+  size="lg"
+  background="default"
+/>
+
+<Hero1 
+  heading="Landing Page"
+  size="lg"
+  paddingBottom="none"  
+  background="dark"
+/>
+```
 
 ### Templates
 
@@ -121,14 +197,44 @@ Templates define the overall page structure and layout. They arrange organisms a
 **Current Templates:**
 | Component | Purpose |
 |-----------|---------|
-| `BaseLayout` | Standard page with header/footer |
+| `BaseLayout` | Standard page with Header1/Footer1 |
 
-**Examples of potential templates:**
-- `BlogLayout` - Article page with sidebar
-- `LandingLayout` - Marketing page without nav
-- `DashboardLayout` - App layout with sidebar
-- `AuthLayout` - Minimal login/signup page
-- `DocsLayout` - Documentation with TOC
+---
+
+## File Structure
+
+```
+src/components/
+├── atoms/                    # Base names, variants via props
+│   ├── Avatar.astro
+│   ├── Badge.astro
+│   ├── Button.astro
+│   ├── Input.astro
+│   └── Text.astro
+│
+├── molecules/                # Numbered variants
+│   ├── Card1.astro          # Basic card
+│   ├── Card2.astro          # Card with image top
+│   ├── Card3.astro          # Horizontal card
+│   ├── FormField.astro      
+│   ├── NavLink.astro        
+│   └── TeamMember.astro     
+│
+├── organisms/                # Numbered sections
+│   ├── Header1.astro        # Standard header
+│   ├── Footer1.astro        # Standard footer
+│   ├── Section.astro        # Base section wrapper
+│   ├── Hero1.astro          # Centered hero
+│   ├── Feature1.astro       # Feature card grid
+│   ├── Stats1.astro         # Stats grid
+│   ├── Team1.astro          # Team grid
+│   ├── Layout1.astro        # Two-column content
+│   ├── CTA1.astro           # Centered CTA
+│   └── CTA2.astro           # CTA with image
+│
+└── templates/
+    └── BaseLayout.astro
+```
 
 ---
 
@@ -141,27 +247,30 @@ Templates
                                         └── contain → Atoms
 ```
 
-### Example: Contact Page
+### Example: About Page
 
 ```
 BaseLayout (Template)
-├── Header (Organism)
-│   ├── Logo (Atom - could be Image)
-│   ├── NavLink (Molecule) × 4
-│   └── Button (Atom)
-├── Section (Organism)
-│   ├── Text (Atom) - Title
-│   └── Text (Atom) - Subtitle
-├── Card (Molecule)
-│   ├── FormField (Molecule)
-│   │   ├── Label (implicit)
-│   │   └── Input (Atom)
-│   ├── FormField (Molecule)
-│   │   └── Input (Atom) as textarea
-│   └── Button (Atom)
-└── Footer (Organism)
-    ├── Text (Atom) - Copyright
-    └── NavLink (Molecule) × 3
+├── Header1 (Organism)
+│   ├── Logo (implicit)
+│   ├── NavLink (Molecule) × 3
+│   └── Button (Atom) - optional actions
+├── Hero1 (Organism)
+│   ├── Badge (Atom) - tagline
+│   ├── Heading (implicit)
+│   └── Text (implicit) - description
+├── Layout1 (Organism)
+│   ├── Badge (Atom) - tagline
+│   ├── Content area
+│   └── Card1 (Molecule) - media slot
+├── Feature1 (Organism)
+│   └── Card1 (Molecule) × N - features
+├── Team1 (Organism)
+│   └── TeamMember (Molecule) × N
+├── CTA1 (Organism)
+│   └── Button (Atom) × N
+└── Footer1 (Organism)
+    └── NavLink (Molecule) × N
 ```
 
 ---
@@ -175,6 +284,7 @@ Create an atom when:
 - It cannot be meaningfully split further
 - It's used in many different contexts
 - It has no awareness of its siblings
+- **Use props for variants, not numbered names**
 
 ### When to Create a Molecule
 
@@ -183,6 +293,7 @@ Create a molecule when:
 - The combination is reused in multiple places
 - It has a single, clear purpose
 - It's still relatively simple
+- **Create a new number when structure differs** (Card1, Card2, Card3)
 
 ### When to Create an Organism
 
@@ -191,6 +302,7 @@ Create an organism when:
 - It combines multiple molecules/atoms
 - It has its own internal logic or state
 - It represents a distinct UI region
+- **Always use numbered naming** aligned with Relume
 
 ### When to Create a Template
 
@@ -204,48 +316,46 @@ Create a template when:
 
 ## Practical Tips
 
-### 1. Start with Atoms
+### 1. Match Relume Sections
 
-When building a new feature, identify the atomic pieces first:
-- What buttons do I need?
-- What inputs?
-- What text styles?
+When importing from Relume Figma Kit:
+- `Layout 47` in Figma → Create `Layout47.astro` if significantly different
+- Or map to existing: `Layout 47` → `Layout1` if similar structure
 
-### 2. Find Repeated Patterns
+### 2. Use Props for Configuration
 
-Look for combinations that repeat:
-- "I always put a label above an input" → `FormField` molecule
-- "Cards always have this structure" → `Card` molecule
+```astro
+<!-- Good: Same component, different config -->
+<Hero1 size="lg" background="dark" paddingBottom="none" />
 
-### 3. Don't Over-Atomize
+<!-- Avoid: Creating new component just for padding -->
+<Hero1NoPaddingBottom />
+```
 
-Not everything needs to be a component:
-- A single `<p>` tag doesn't need a wrapper
-- Native HTML is fine for simple cases
-- Only abstract when there's reuse or complexity
+### 3. Keep CSS Classes Prefixed
 
-### 4. Keep Atoms Pure
+```css
+/* Good: Clear ownership */
+.hero1_heading { }
+.cta2_content { }
 
-Atoms shouldn't know about:
-- Their parent component
-- Application state
-- Business logic
-- Layout (their container handles positioning)
+/* Avoid: Generic, could conflict */
+.heading { }
+.content { }
+```
 
-### 5. Use Slots for Flexibility
-
-Prefer slots over complex prop APIs:
+### 4. Use Slots for Flexibility
 
 ```astro
 <!-- Good: Flexible via slots -->
-<Card>
+<Card1>
   <img slot="media" src="..." />
   <h3>Title</h3>
   <p>Content</p>
-</Card>
+</Card1>
 
-<!-- Avoid: Rigid prop-based API -->
-<Card
+<!-- Avoid: Rigid prop-based API for complex content -->
+<Card1
   imageSrc="..."
   title="Title"
   content="Content"
@@ -258,4 +368,5 @@ Prefer slots over complex prop APIs:
 
 - [Atomic Design by Brad Frost](https://atomicdesign.bradfrost.com/)
 - [Atomic Design Methodology](https://atomicdesign.bradfrost.com/chapter-2/)
+- [Relume Figma Kit](https://www.relume.io/)
 - [Pattern Lab](https://patternlab.io/) - Tool for atomic design

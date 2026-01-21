@@ -1,119 +1,114 @@
 ---
+/**
+ * Homepage
+ * 
+ * Demonstrates the use of section organisms aligned with Relume Figma Kit patterns.
+ * Each section is a reusable organism component for consistent, maintainable layouts.
+ */
+
 import BaseLayout from '../components/templates/BaseLayout.astro';
-import Section from '../components/organisms/Section.astro';
-import Card from '../components/molecules/Card.astro';
+import Hero1 from '../components/organisms/Hero1.astro';
+import Feature1 from '../components/organisms/Feature1.astro';
+import Layout1 from '../components/organisms/Layout1.astro';
+import CTA1 from '../components/organisms/CTA1.astro';
+import Card1 from '../components/molecules/Card1.astro';
 import Button from '../components/atoms/Button.astro';
 import Badge from '../components/atoms/Badge.astro';
+
+// Data for our sections - could be fetched from a CMS
+const features = [
+  { 
+    icon: '◈', 
+    title: 'Atomic Design', 
+    description: 'Components organized into atoms, molecules, organisms, and templates for maximum reusability and consistency.' 
+  },
+  { 
+    icon: '✦', 
+    title: 'CSS Variables', 
+    description: 'Every component is customizable through CSS custom properties. Override tokens to match your brand instantly.' 
+  },
+  { 
+    icon: '●', 
+    title: 'No Dependencies', 
+    description: 'Pure vanilla CSS with no framework dependencies. Just Astro and your creativity. No build complexity.' 
+  },
+];
+
+const steps = [
+  {
+    step: 'Step 1',
+    title: 'Set Up Your Design Tokens',
+    description: 'Define your colors, typography, spacing, and other design tokens in tokens.css. These variables cascade to all components.',
+  },
+  {
+    step: 'Step 2',
+    title: 'Copy Components You Need',
+    description: 'Browse the component library and copy the ones you need. Each component is self-contained and documented.',
+  },
+  {
+    step: 'Step 3',
+    title: 'Customize Per-Component',
+    description: 'Override component-specific variables to fine-tune individual components without affecting others.',
+  },
+];
 ---
 
 <BaseLayout title="Home">
   <main>
     <!-- Hero Section -->
-    <Section size="lg" centerHeading>
-      <div slot="header">
-        <Badge variant="primary" class="mb-4">Vanilla CSS Design System</Badge>
-        <h1 class="display-1 mb-4">Build Faster with<br />Astro Components</h1>
-        <p class="body-large" style="max-width: 55ch; margin: 0 auto;">
-          A minimal, unstyled component library for Astro with an atomic design
-          structure. Customize everything through CSS variables.
-        </p>
-      </div>
-
-      <div class="flex justify-center gap-4">
-        <Button variant="primary" size="lg">Get Started</Button>
-        <Button variant="secondary" size="lg" as="a" href="/style-guide">
-          View Style Guide
-        </Button>
-      </div>
-    </Section>
+    <Hero1
+      tagline="Vanilla CSS Design System"
+      heading="Build Faster with<br />Astro Components"
+      description="A minimal, unstyled component library for Astro with an atomic design structure. Customize everything through CSS variables."
+    >
+      <Button variant="primary" size="lg">Get Started</Button>
+      <Button variant="secondary" size="lg" as="a" href="/style-guide">
+        View Style Guide
+      </Button>
+    </Hero1>
 
     <!-- Features Section -->
-    <Section
+    <Feature1
       title="Why This Starter?"
       subtitle="Everything you need to build beautiful, consistent interfaces."
+      features={features}
+      columns={3}
+      cardVariant="elevated"
       background="muted"
-      centerHeading
-    >
-      <div class="grid md:grid-cols-3 gap-6">
-        <Card>
-          <h3 class="heading-4 mb-2">Atomic Design</h3>
-          <p class="body-small">
-            Components organized into atoms, molecules, organisms, and templates
-            for maximum reusability and consistency.
-          </p>
-        </Card>
-
-        <Card>
-          <h3 class="heading-4 mb-2">CSS Variables</h3>
-          <p class="body-small">
-            Every component is customizable through CSS custom properties.
-            Override tokens to match your brand instantly.
-          </p>
-        </Card>
-
-        <Card>
-          <h3 class="heading-4 mb-2">No Dependencies</h3>
-          <p class="body-small">
-            Pure vanilla CSS with no framework dependencies. Just Astro and your
-            creativity. No build complexity.
-          </p>
-        </Card>
-      </div>
-    </Section>
+    />
 
     <!-- How It Works Section -->
-    <Section
-      title="How It Works"
-      subtitle="Copy components, customize tokens, and build your site."
-      centerHeading
+    <Layout1
+      tagline="How It Works"
+      heading="Copy components, customize tokens, and build your site."
     >
-      <div class="grid md:grid-cols-2 gap-8 items-center">
-        <div class="stack-lg">
+      <div class="stack-lg">
+        {steps.map((item) => (
           <div>
-            <Badge class="mb-2">Step 1</Badge>
-            <h3 class="heading-5 mb-2">Set Up Your Design Tokens</h3>
-            <p class="body-base">
-              Define your colors, typography, spacing, and other design tokens in
-              <code>tokens.css</code>. These variables cascade to all components.
-            </p>
+            <Badge class="mb-2">{item.step}</Badge>
+            <h3 class="heading-5 mb-2">{item.title}</h3>
+            <p class="text-regular">{item.description}</p>
           </div>
+        ))}
+      </div>
 
-          <div>
-            <Badge class="mb-2">Step 2</Badge>
-            <h3 class="heading-5 mb-2">Copy Components You Need</h3>
-            <p class="body-base">
-              Browse the component library and copy the ones you need. Each
-              component is self-contained and documented.
-            </p>
-          </div>
-
-          <div>
-            <Badge class="mb-2">Step 3</Badge>
-            <h3 class="heading-5 mb-2">Customize Per-Component</h3>
-            <p class="body-base">
-              Override component-specific variables to fine-tune individual
-              components without affecting others.
-            </p>
-          </div>
-        </div>
-
-        <Card variant="filled" class="p-8">
-          <pre class="mb-0"><code>/* Override button styles globally */
-:root {'{'}
+      <Card1 slot="media" variant="filled" class="p-8">
+        <pre class="mb-0"><code>{`/* Override button styles globally */
+:root {
   --btn-primary-bg: #6366f1;
   --btn-border-radius: 9999px;
   --btn-font-weight: 600;
-{'}'}</code></pre>
-        </Card>
-      </div>
-    </Section>
+}`}</code></pre>
+      </Card1>
+    </Layout1>
 
     <!-- CTA Section -->
-    <Section background="primary" size="lg" centerHeading>
-      <h2 class="heading-2 mb-4">Ready to Get Started?</h2>
-      <p class="body-large mb-8" style="opacity: 0.9;">
-        Explore the style guide to see all available components and design tokens.
-      </p>
+    <CTA1
+      heading="Ready to Get Started?"
+      description="Explore the style guide to see all available components and design tokens."
+      background="primary"
+      size="lg"
+    >
       <Button
         variant="secondary"
         size="lg"
@@ -123,6 +118,6 @@ import Badge from '../components/atoms/Badge.astro';
       >
         View Style Guide
       </Button>
-    </Section>
+    </CTA1>
   </main>
 </BaseLayout>

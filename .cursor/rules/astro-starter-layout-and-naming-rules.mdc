@@ -1,0 +1,154 @@
+---
+name: astro-starter-layout-and-naming-rules
+description: Relume-aligned naming conventions and component structure for the Astro Starter design system
+globs:
+  - "src/components/**/*.astro"
+  - "src/pages/**/*.astro"
+---
+
+# Astro Starter - Layout and Naming Conventions
+
+This project uses a Relume-aligned naming convention for seamless Figma-to-code workflow with the Relume Figma Kit.
+
+## Core Principle: Numbers vs Props
+
+```
+Numbers = Different STRUCTURE (different HTML/layout)
+Props   = Different CONFIGURATION (same structure, different styling)
+```
+
+### When to Create a NEW Numbered Variant
+- Different HTML structure
+- Different visual layout (centered vs split, single vs two-column)
+- Different content arrangement
+
+### When to Use PROPS on Existing Component
+- Padding/spacing variations (`size`, `paddingTop`, `paddingBottom`)
+- Background color changes (`background`)
+- Alignment options (`align`, `centered`)
+- Container width (`containerWidth`)
+
+## Naming Convention by Component Level
+
+| Level | Convention | Example |
+|-------|------------|---------|
+| **Atoms** | Base name + variant props | `Button variant="primary"` |
+| **Molecules** | `{Type}{Number}` | `Card1`, `Card2`, `Card3` |
+| **Organisms** | `{Category}{Number}` | `Header1`, `Hero1`, `CTA1`, `Footer1` |
+
+## CSS Class Naming Pattern
+
+Use `{category}{number}_{element}` with underscore separator:
+
+```css
+/* Correct */
+.hero1_heading { }
+.hero1_content { }
+.hero1_actions { }
+.cta2_grid { }
+.cta2_image-wrapper { }
+.card1_body { }
+
+/* Incorrect - avoid these patterns */
+.hero__heading { }      /* BEM double underscore */
+.hero-heading { }       /* No component number */
+.heroHeading { }        /* camelCase */
+```
+
+## Standard Props for Section Organisms
+
+All section organisms should accept these configuration props:
+
+```typescript
+interface SectionProps {
+  // Padding control
+  size?: 'sm' | 'md' | 'lg';
+  paddingTop?: 'none' | 'sm' | 'md' | 'lg';
+  paddingBottom?: 'none' | 'sm' | 'md' | 'lg';
+  
+  // Background
+  background?: 'default' | 'muted' | 'primary' | 'dark';
+  
+  // Container
+  contained?: boolean;
+  containerWidth?: 'small' | 'medium' | 'large' | 'full';
+}
+```
+
+## Current Component Inventory
+
+### Atoms (Base names, no numbers)
+- `Button` - with `variant` prop for primary/secondary/ghost
+- `Badge` - with `variant` prop for colors
+- `Input` - with `size` prop
+- `Avatar` - with `size` and `shape` props
+- `Text` - typography wrapper
+
+### Molecules (Numbered when structurally different)
+- `Card1` - Basic card with slots (header, body, footer, media)
+- `Card2` - Card with image at top (vertical media card)
+- `Card3` - Horizontal card layout
+- `FormField` - Label + Input + helper (single implementation)
+- `NavLink` - Navigation link with active state
+- `TeamMember` - Avatar + name + role
+
+### Organisms (Always numbered, Relume-aligned)
+- `Header1` - Standard navigation header
+- `Footer1` - Standard site footer
+- `Section` - Base section wrapper (no number, it's a utility)
+- `Hero1` - Centered hero section
+- `Feature1` - Card grid section
+- `Stats1` - Statistics grid
+- `Team1` - Team member grid
+- `Layout1` - Two-column content + media
+- `CTA1` - Centered call-to-action
+- `CTA2` - Two-column CTA with image
+
+## File Structure
+
+```
+src/components/
+├── atoms/           # Base names, variants via props
+├── molecules/       # Numbered variants for structural differences
+├── organisms/       # Always numbered (Relume-aligned)
+└── templates/       # Page layouts (BaseLayout, etc.)
+```
+
+## Creating New Components
+
+### Adding a New Organism Variant
+
+1. Identify the category (Hero, CTA, Feature, Layout, etc.)
+2. Check existing variants to determine the next number
+3. Create file: `{Category}{NextNumber}.astro`
+4. Use CSS class prefix: `.{category}{number}_`
+5. Include standard section props (size, paddingTop, paddingBottom, background)
+6. Export from `organisms/index.ts`
+
+### Adding a New Molecule Variant
+
+1. Identify the type (Card, etc.)
+2. Only create a numbered variant if structure differs significantly
+3. Create file: `{Type}{NextNumber}.astro`
+4. Use CSS class prefix: `.{type}{number}_`
+5. Export from `molecules/index.ts`
+
+## Import Patterns
+
+```astro
+// Preferred: Direct imports
+import Hero1 from '../components/organisms/Hero1.astro';
+import Card1 from '../components/molecules/Card1.astro';
+import Button from '../components/atoms/Button.astro';
+
+// Also valid: Barrel imports
+import { Hero1, CTA1, Feature1 } from '@organisms';
+import { Card1, Card2 } from '@molecules';
+```
+
+## Mapping Relume Components
+
+When importing from Relume Figma Kit:
+- `Layout 47` → Create `Layout47.astro` if significantly different, or map to existing `Layout1` if similar
+- `CTA 5` → Create `CTA5.astro` following the established pattern
+- Use the same number as Relume when possible for easy reference

@@ -1,0 +1,176 @@
+---
+/**
+ * Stats1 Component (Organism)
+ *
+ * Displays a grid of statistics/metrics. Commonly used to showcase
+ * achievements, numbers, or key metrics.
+ *
+ * Naming: Stats1 follows Relume naming convention.
+ * - Stats1: Simple grid layout (this component)
+ * - Stats2: Would be stats with icons
+ * - Stats3: Would be stats in cards
+ *
+ * @example
+ * <Stats1
+ *   stats={[
+ *     { value: '100+', label: 'Projects' },
+ *     { value: '50+', label: 'Clients' },
+ *     { value: '5+', label: 'Years' },
+ *   ]}
+ * />
+ *
+ * @customization
+ * Override these CSS variables to customize:
+ * --stats1-gap, --stats1-value-size, --stats1-label-color
+ */
+
+import Section from './Section.astro';
+
+interface Stat {
+  /** The numeric or text value */
+  value: string;
+  /** Label describing the stat */
+  label: string;
+}
+
+interface Props {
+  /** Array of stats to display */
+  stats: Stat[];
+  /** Section title */
+  title?: string;
+  /** Section subtitle */
+  subtitle?: string;
+  /** Number of columns (2, 3, or 4) */
+  columns?: 2 | 3 | 4;
+  /** Section size (vertical padding) */
+  size?: 'sm' | 'md' | 'lg';
+  /** Override top padding */
+  paddingTop?: 'none' | 'sm' | 'md' | 'lg';
+  /** Override bottom padding */
+  paddingBottom?: 'none' | 'sm' | 'md' | 'lg';
+  /** Background variant */
+  background?: 'default' | 'muted' | 'primary' | 'dark';
+  /** Center the stats */
+  centered?: boolean;
+  /** Additional CSS classes */
+  class?: string;
+  [key: string]: any;
+}
+
+const {
+  stats,
+  title,
+  subtitle,
+  columns = 4,
+  size = 'md',
+  paddingTop,
+  paddingBottom,
+  background = 'default',
+  centered = true,
+  class: className = '',
+  ...rest
+} = Astro.props;
+
+// Build padding classes
+const paddingClasses = [
+  paddingTop && `padding-top-${paddingTop}`,
+  paddingBottom && `padding-bottom-${paddingBottom}`,
+].filter(Boolean).join(' ');
+
+const gridClass = `stats1_grid stats1_grid--cols-${columns}`;
+
+const sectionClasses = [
+  'stats1',
+  paddingClasses,
+  className,
+].filter(Boolean).join(' ');
+---
+
+<Section 
+  title={title}
+  subtitle={subtitle}
+  size={size} 
+  background={background}
+  centerHeading={centered}
+  class={sectionClasses}
+  {...rest}
+>
+  <div class={gridClass}>
+    {stats.map((stat) => (
+      <div class="stats1_item">
+        <span class="stats1_value">{stat.value}</span>
+        <span class="stats1_label">{stat.label}</span>
+      </div>
+    ))}
+  </div>
+</Section>
+
+<style>
+  /* Padding override classes */
+  .padding-top-none { padding-top: 0 !important; }
+  .padding-top-sm { padding-top: var(--padding-section-small) !important; }
+  .padding-top-md { padding-top: var(--padding-section-medium) !important; }
+  .padding-top-lg { padding-top: var(--padding-section-large) !important; }
+  
+  .padding-bottom-none { padding-bottom: 0 !important; }
+  .padding-bottom-sm { padding-bottom: var(--padding-section-small) !important; }
+  .padding-bottom-md { padding-bottom: var(--padding-section-medium) !important; }
+  .padding-bottom-lg { padding-bottom: var(--padding-section-large) !important; }
+
+  .stats1_grid {
+    display: grid;
+    gap: var(--stats1-gap, var(--space-8));
+  }
+
+  .stats1_grid--cols-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .stats1_grid--cols-3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .stats1_grid--cols-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (min-width: 768px) {
+    .stats1_grid--cols-3 {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .stats1_grid--cols-4 {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  .stats1_item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    text-align: center;
+  }
+
+  .stats1_value {
+    font-size: var(--stats1-value-size, var(--text-size-h2));
+    font-weight: var(--stats1-value-weight, var(--font-weight-bold));
+    line-height: var(--line-height-tight);
+    color: var(--stats1-value-color, var(--color-text-primary));
+  }
+
+  .stats1_label {
+    font-size: var(--stats1-label-size, var(--text-size-regular));
+    color: var(--stats1-label-color, var(--color-text-secondary));
+  }
+
+  /* Adjust colors for dark backgrounds */
+  :global(.section--bg-primary) .stats1_value,
+  :global(.section--bg-dark) .stats1_value {
+    color: var(--stats1-value-color-inverse, var(--color-white));
+  }
+
+  :global(.section--bg-primary) .stats1_label,
+  :global(.section--bg-dark) .stats1_label {
+    color: var(--stats1-label-color-inverse, rgba(255, 255, 255, 0.8));
+  }
+</style>

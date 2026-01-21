@@ -36,8 +36,8 @@ interface Props {
 }
 
 import '@styles/main.css';
-import Header from '@organisms/Header.astro';
-import Footer from '@organisms/Footer.astro';
+import Header1 from '@organisms/Header1.astro';
+import Footer1 from '@organisms/Footer1.astro';
 import NavLink from '@molecules/NavLink.astro';
 
 const {
@@ -100,23 +100,24 @@ const canonical = canonicalUrl || Astro.url.href;
 
   <body class={bodyClass}>
     {!hideHeader && (
-      <Header siteName={siteConfig.name} sticky>
+      <Header1 siteName={siteConfig.name} sticky>
         <nav slot="nav">
           <NavLink href="/">Home</NavLink>
+          <NavLink href="/about">About</NavLink>
           <NavLink href="/style-guide">Style Guide</NavLink>
         </nav>
-      </Header>
+      </Header1>
     )}
 
     <slot />
 
     {!hideFooter && (
-      <Footer siteName={siteConfig.name}>
+      <Footer1 siteName={siteConfig.name}>
         <nav slot="nav">
           <a href="/privacy">Privacy</a>
           <a href="/terms">Terms</a>
         </nav>
-      </Footer>
+      </Footer1>
     )}
 
     <!-- Additional body scripts -->

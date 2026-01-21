@@ -1,0 +1,142 @@
+---
+/**
+ * CTA1 Component (Organism)
+ *
+ * A centered call-to-action section with heading, description, and action buttons.
+ * Designed for conversion-focused sections.
+ *
+ * Naming: CTA1 follows Relume naming convention.
+ * - CTA1: Centered layout (this component)
+ * - CTA2: Would be CTA with side image
+ * - CTA3: Would be CTA with background image
+ *
+ * @example
+ * <CTA1
+ *   heading="Ready to Get Started?"
+ *   description="Join thousands of happy customers today."
+ * >
+ *   <Button variant="primary">Sign Up Free</Button>
+ * </CTA1>
+ *
+ * @customization
+ * Override these CSS variables to customize:
+ * --cta1-padding, --cta1-heading-size, --cta1-max-width
+ */
+
+import Section from './Section.astro';
+
+interface Props {
+  /** Main heading text */
+  heading: string;
+  /** Description/subtitle text */
+  description?: string;
+  /** Background variant */
+  background?: 'default' | 'muted' | 'primary' | 'dark';
+  /** Section size (vertical padding) */
+  size?: 'sm' | 'md' | 'lg';
+  /** Override top padding */
+  paddingTop?: 'none' | 'sm' | 'md' | 'lg';
+  /** Override bottom padding */
+  paddingBottom?: 'none' | 'sm' | 'md' | 'lg';
+  /** Text alignment */
+  align?: 'left' | 'center';
+  /** Additional CSS classes */
+  class?: string;
+  [key: string]: any;
+}
+
+const {
+  heading,
+  description,
+  background = 'primary',
+  size = 'md',
+  paddingTop,
+  paddingBottom,
+  align = 'center',
+  class: className = '',
+  ...rest
+} = Astro.props;
+
+// Build padding classes
+const paddingClasses = [
+  paddingTop && `padding-top-${paddingTop}`,
+  paddingBottom && `padding-bottom-${paddingBottom}`,
+].filter(Boolean).join(' ');
+
+const ctaClasses = [
+  'cta1',
+  `cta1--${align}`,
+  paddingClasses,
+  className,
+].filter(Boolean).join(' ');
+---
+
+<Section 
+  size={size} 
+  background={background}
+  centerHeading={align === 'center'}
+  class={ctaClasses}
+  {...rest}
+>
+  <div class="cta1_content">
+    <h2 class="cta1_heading">{heading}</h2>
+    {description && (
+      <p class="cta1_description">{description}</p>
+    )}
+    <div class="cta1_actions">
+      <slot />
+    </div>
+  </div>
+</Section>
+
+<style>
+  /* Padding override classes */
+  .padding-top-none { padding-top: 0 !important; }
+  .padding-top-sm { padding-top: var(--padding-section-small) !important; }
+  .padding-top-md { padding-top: var(--padding-section-medium) !important; }
+  .padding-top-lg { padding-top: var(--padding-section-large) !important; }
+  
+  .padding-bottom-none { padding-bottom: 0 !important; }
+  .padding-bottom-sm { padding-bottom: var(--padding-section-small) !important; }
+  .padding-bottom-md { padding-bottom: var(--padding-section-medium) !important; }
+  .padding-bottom-lg { padding-bottom: var(--padding-section-large) !important; }
+
+  .cta1_content {
+    max-width: var(--cta1-max-width, 55ch);
+  }
+
+  .cta1--center .cta1_content {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+  }
+
+  .cta1--left .cta1_content {
+    text-align: left;
+  }
+
+  .cta1_heading {
+    font-family: var(--cta1-heading-font, var(--font-family-sans));
+    font-size: var(--cta1-heading-size, var(--text-size-h3));
+    font-weight: var(--cta1-heading-weight, var(--font-weight-bold));
+    line-height: var(--line-height-tight);
+    margin: 0 0 var(--space-4) 0;
+  }
+
+  .cta1_description {
+    font-size: var(--cta1-description-size, var(--text-size-medium));
+    line-height: var(--line-height-relaxed);
+    margin: 0 0 var(--space-6) 0;
+    opacity: 0.9;
+  }
+
+  .cta1_actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+  }
+
+  .cta1--center .cta1_actions {
+    justify-content: center;
+  }
+</style>

@@ -1,0 +1,175 @@
+---
+/**
+ * Team1 Component (Organism)
+ *
+ * Displays a team members grid. Commonly used for about pages,
+ * team pages, or leadership sections.
+ *
+ * Naming: Team1 follows Relume naming convention.
+ * - Team1: Simple avatar grid (this component)
+ * - Team2: Would be team with cards
+ * - Team3: Would be team with social links
+ *
+ * @example
+ * <Team1
+ *   title="Our Team"
+ *   members={[
+ *     { name: 'Jane Doe', role: 'CEO', image: '/images/jane.jpg' },
+ *     { name: 'John Smith', role: 'CTO', image: '/images/john.jpg' },
+ *   ]}
+ * />
+ *
+ * @customization
+ * Override these CSS variables to customize:
+ * --team1-gap, --team1-member-*, avatar variables
+ */
+
+import Section from './Section.astro';
+import TeamMember from '@molecules/TeamMember.astro';
+
+interface Member {
+  /** Team member name */
+  name: string;
+  /** Team member role/title */
+  role: string;
+  /** Avatar image URL */
+  image?: string;
+  /** Short bio */
+  bio?: string;
+}
+
+interface Props {
+  /** Section title */
+  title?: string;
+  /** Section subtitle */
+  subtitle?: string;
+  /** Array of team members */
+  members: Member[];
+  /** Number of columns (2, 3, or 4) */
+  columns?: 2 | 3 | 4;
+  /** Avatar size */
+  avatarSize?: 'md' | 'lg' | 'xl';
+  /** Section size (vertical padding) */
+  size?: 'sm' | 'md' | 'lg';
+  /** Override top padding */
+  paddingTop?: 'none' | 'sm' | 'md' | 'lg';
+  /** Override bottom padding */
+  paddingBottom?: 'none' | 'sm' | 'md' | 'lg';
+  /** Background variant */
+  background?: 'default' | 'muted' | 'primary' | 'dark';
+  /** Center alignment */
+  centered?: boolean;
+  /** Additional CSS classes */
+  class?: string;
+  [key: string]: any;
+}
+
+const {
+  title,
+  subtitle,
+  members,
+  columns = 4,
+  avatarSize = 'xl',
+  size = 'md',
+  paddingTop,
+  paddingBottom,
+  background = 'default',
+  centered = true,
+  class: className = '',
+  ...rest
+} = Astro.props;
+
+// Build padding classes
+const paddingClasses = [
+  paddingTop && `padding-top-${paddingTop}`,
+  paddingBottom && `padding-bottom-${paddingBottom}`,
+].filter(Boolean).join(' ');
+
+const gridClass = [
+  'team1_grid',
+  `team1_grid--cols-${columns}`,
+].join(' ');
+
+const sectionClasses = [
+  'team1',
+  paddingClasses,
+  className,
+].filter(Boolean).join(' ');
+---
+
+<Section 
+  title={title}
+  subtitle={subtitle}
+  size={size} 
+  background={background}
+  centerHeading={centered}
+  class={sectionClasses}
+  {...rest}
+>
+  <div class={gridClass}>
+    {members.map((member) => (
+      <TeamMember
+        name={member.name}
+        role={member.role}
+        image={member.image}
+        bio={member.bio}
+        avatarSize={avatarSize}
+        align={centered ? 'center' : 'left'}
+      />
+    ))}
+  </div>
+  
+  <!-- Slot for additional content -->
+  <slot />
+</Section>
+
+<style>
+  /* Padding override classes */
+  .padding-top-none { padding-top: 0 !important; }
+  .padding-top-sm { padding-top: var(--padding-section-small) !important; }
+  .padding-top-md { padding-top: var(--padding-section-medium) !important; }
+  .padding-top-lg { padding-top: var(--padding-section-large) !important; }
+  
+  .padding-bottom-none { padding-bottom: 0 !important; }
+  .padding-bottom-sm { padding-bottom: var(--padding-section-small) !important; }
+  .padding-bottom-md { padding-bottom: var(--padding-section-medium) !important; }
+  .padding-bottom-lg { padding-bottom: var(--padding-section-large) !important; }
+
+  .team1_grid {
+    display: grid;
+    gap: var(--team1-gap, var(--space-8));
+  }
+
+  .team1_grid--cols-2 {
+    grid-template-columns: repeat(1, 1fr);
+  }
+
+  .team1_grid--cols-3 {
+    grid-template-columns: repeat(1, 1fr);
+  }
+
+  .team1_grid--cols-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (min-width: 640px) {
+    .team1_grid--cols-2 {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .team1_grid--cols-3,
+    .team1_grid--cols-4 {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .team1_grid--cols-3 {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .team1_grid--cols-4 {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+</style>

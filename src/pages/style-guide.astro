@@ -1,7 +1,7 @@
 ---
 import BaseLayout from '../components/templates/BaseLayout.astro';
 import Section from '../components/organisms/Section.astro';
-import Card from '../components/molecules/Card.astro';
+import Card1 from '../components/molecules/Card1.astro';
 import FormField from '../components/molecules/FormField.astro';
 import Button from '../components/atoms/Button.astro';
 import Input from '../components/atoms/Input.astro';
@@ -156,7 +156,7 @@ import Text from '../components/atoms/Text.astro';
     <Section id="typography" title="Typography" subtitle="Type scale and text styles." background="muted">
       <div class="stack-lg">
         <!-- Display Styles -->
-        <Card>
+        <Card1>
           <h3 class="heading-5 mb-6">Display Styles</h3>
           <div class="stack">
             <div class="flex items-baseline gap-4">
@@ -168,10 +168,10 @@ import Text from '../components/atoms/Text.astro';
               <span class="display-2">The quick brown fox</span>
             </div>
           </div>
-        </Card>
+        </Card1>
 
         <!-- Heading Styles -->
-        <Card>
+        <Card1>
           <h3 class="heading-5 mb-6">Heading Styles</h3>
           <div class="stack">
             <div class="flex items-baseline gap-4">
@@ -199,10 +199,10 @@ import Text from '../components/atoms/Text.astro';
               <span class="heading-6">The quick brown fox</span>
             </div>
           </div>
-        </Card>
+        </Card1>
 
         <!-- Body Styles -->
-        <Card>
+        <Card1>
           <h3 class="heading-5 mb-6">Body Styles</h3>
           <div class="stack">
             <div class="flex items-baseline gap-4">
@@ -222,10 +222,10 @@ import Text from '../components/atoms/Text.astro';
               <span class="body-xs">The quick brown fox jumps over the lazy dog.</span>
             </div>
           </div>
-        </Card>
+        </Card1>
 
         <!-- Utility Styles -->
-        <Card>
+        <Card1>
           <h3 class="heading-5 mb-6">Utility Styles</h3>
           <div class="stack">
             <div class="flex items-baseline gap-4">
@@ -241,13 +241,13 @@ import Text from '../components/atoms/Text.astro';
               <span class="overline">Overline Text</span>
             </div>
           </div>
-        </Card>
+        </Card1>
       </div>
     </Section>
 
     <!-- Spacing -->
     <Section id="spacing" title="Spacing" subtitle="Consistent spacing scale based on a 4px grid.">
-      <Card>
+      <Card1>
         <div class="stack">
           {[1, 2, 3, 4, 5, 6, 8, 10, 12, 16, 20, 24].map((size) => (
             <div class="flex items-center gap-4">
@@ -260,86 +260,86 @@ import Text from '../components/atoms/Text.astro';
             </div>
           ))}
         </div>
-      </Card>
+      </Card1>
     </Section>
 
     <!-- Buttons -->
     <Section id="buttons" title="Buttons" subtitle="Interactive button components with variants and sizes." background="muted">
       <div class="stack-lg">
         <!-- Variants -->
-        <Card>
+        <Card1>
           <h3 class="heading-5 mb-6">Variants</h3>
           <div class="flex flex-wrap gap-4">
             <Button variant="primary">Primary</Button>
             <Button variant="secondary">Secondary</Button>
             <Button variant="ghost">Ghost</Button>
           </div>
-        </Card>
+        </Card1>
 
         <!-- Sizes -->
-        <Card>
+        <Card1>
           <h3 class="heading-5 mb-6">Sizes</h3>
           <div class="flex flex-wrap items-center gap-4">
             <Button size="sm">Small</Button>
             <Button size="md">Medium</Button>
             <Button size="lg">Large</Button>
           </div>
-        </Card>
+        </Card1>
 
         <!-- States -->
-        <Card>
+        <Card1>
           <h3 class="heading-5 mb-6">States</h3>
           <div class="flex flex-wrap items-center gap-4">
             <Button>Default</Button>
             <Button disabled>Disabled</Button>
             <Button fullWidth>Full Width</Button>
           </div>
-        </Card>
+        </Card1>
 
         <!-- As Link -->
-        <Card>
+        <Card1>
           <h3 class="heading-5 mb-6">As Link</h3>
           <div class="flex flex-wrap gap-4">
             <Button as="a" href="#">Link Button</Button>
             <Button as="a" href="#" variant="secondary">Secondary Link</Button>
           </div>
-        </Card>
+        </Card1>
       </div>
     </Section>
 
     <!-- Inputs -->
     <Section id="inputs" title="Inputs" subtitle="Form input components for user data entry.">
       <div class="stack-lg">
-        <Card>
+        <Card1>
           <h3 class="heading-5 mb-6">Sizes</h3>
           <div class="stack max-w-md">
             <Input name="input-sm" size="sm" placeholder="Small input" />
             <Input name="input-md" size="md" placeholder="Medium input" />
             <Input name="input-lg" size="lg" placeholder="Large input" />
           </div>
-        </Card>
+        </Card1>
 
-        <Card>
+        <Card1>
           <h3 class="heading-5 mb-6">States</h3>
           <div class="stack max-w-md">
             <Input name="input-default" placeholder="Default state" />
             <Input name="input-error" placeholder="Error state" error />
             <Input name="input-disabled" placeholder="Disabled state" disabled />
           </div>
-        </Card>
+        </Card1>
 
-        <Card>
+        <Card1>
           <h3 class="heading-5 mb-6">Textarea</h3>
           <div class="max-w-md">
             <Input name="textarea" as="textarea" placeholder="Enter your message..." rows={4} />
           </div>
-        </Card>
+        </Card1>
       </div>
     </Section>
 
     <!-- Badges -->
     <Section id="badges" title="Badges" subtitle="Small labels for status and categories." background="muted">
-      <Card>
+      <Card1>
         <div class="stack">
           <div>
             <h3 class="heading-5 mb-4">Variants</h3>
@@ -361,47 +361,47 @@ import Text from '../components/atoms/Text.astro';
             </div>
           </div>
         </div>
-      </Card>
+      </Card1>
     </Section>
 
     <!-- Cards -->
     <Section id="cards" title="Cards" subtitle="Container components for grouping related content.">
       <div class="grid md:grid-cols-3 gap-6">
-        <Card variant="elevated">
+        <Card1 variant="elevated">
           <h3 class="heading-5 mb-2">Elevated</h3>
           <p class="body-small">Card with shadow elevation for visual hierarchy.</p>
-        </Card>
+        </Card1>
 
-        <Card variant="outlined">
+        <Card1 variant="outlined">
           <h3 class="heading-5 mb-2">Outlined</h3>
           <p class="body-small">Card with border outline for subtle separation.</p>
-        </Card>
+        </Card1>
 
-        <Card variant="filled">
+        <Card1 variant="filled">
           <h3 class="heading-5 mb-2">Filled</h3>
           <p class="body-small">Card with background fill for grouped sections.</p>
-        </Card>
+        </Card1>
       </div>
 
       <div class="mt-8">
         <h3 class="heading-5 mb-4">Interactive Card</h3>
         <div class="grid md:grid-cols-2 gap-6">
-          <Card variant="outlined" interactive>
+          <Card1 variant="outlined" interactive>
             <h3 class="heading-5 mb-2">Clickable Card</h3>
             <p class="body-small">Hover to see the interactive effect. Use for clickable items.</p>
-          </Card>
+          </Card1>
 
-          <Card variant="elevated" href="#cards">
+          <Card1 variant="elevated" href="#cards">
             <h3 class="heading-5 mb-2">Link Card</h3>
             <p class="body-small">This entire card is a link. Great for article previews.</p>
-          </Card>
+          </Card1>
         </div>
       </div>
     </Section>
 
     <!-- Forms -->
     <Section id="forms" title="Forms" subtitle="Complete form field components with labels and validation." background="muted">
-      <Card class="max-w-lg">
+      <Card1 class="max-w-lg">
         <form class="stack">
           <FormField
             label="Full Name"
@@ -440,7 +440,7 @@ import Text from '../components/atoms/Text.astro';
             <Button type="reset" variant="ghost">Reset</Button>
           </div>
         </form>
-      </Card>
+      </Card1>
     </Section>
   </main>
 </BaseLayout>

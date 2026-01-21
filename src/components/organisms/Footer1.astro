@@ -1,0 +1,175 @@
+---
+/**
+ * Footer1 Component (Organism)
+ *
+ * Standard site footer with customizable sections for navigation,
+ * social links, and legal information.
+ *
+ * Naming: Footer1 follows Relume naming convention for variants.
+ * Use Footer2, Footer3, etc. for different footer layouts.
+ *
+ * @example
+ * <Footer1 siteName="My Site" copyrightYear={2024}>
+ *   <nav slot="nav">
+ *     <a href="/privacy">Privacy</a>
+ *     <a href="/terms">Terms</a>
+ *   </nav>
+ *   <div slot="social">
+ *     <a href="https://twitter.com">Twitter</a>
+ *   </div>
+ * </Footer1>
+ *
+ * @customization
+ * Override these CSS variables to customize:
+ * --footer1-bg, --footer1-padding, --footer1-border-color
+ */
+
+interface Props {
+  /** Site name for copyright */
+  siteName?: string;
+  /** Copyright year (defaults to current year) */
+  copyrightYear?: number;
+  /** Custom copyright text (overrides default) */
+  copyrightText?: string;
+  /** Additional CSS classes */
+  class?: string;
+  [key: string]: any;
+}
+
+const {
+  siteName = 'Site Name',
+  copyrightYear = new Date().getFullYear(),
+  copyrightText,
+  class: className = '',
+  ...rest
+} = Astro.props;
+
+const hasNav = Astro.slots.has('nav');
+const hasSocial = Astro.slots.has('social');
+const hasContent = Astro.slots.has('default');
+
+const defaultCopyright = `© ${copyrightYear} ${siteName}. All rights reserved.`;
+
+const classes = [
+  'footer1',
+  className,
+].filter(Boolean).join(' ');
+---
+
+<footer class={classes} {...rest}>
+  <div class="footer1_container">
+    {hasContent && (
+      <div class="footer1_content">
+        <slot />
+      </div>
+    )}
+
+    <div class="footer1_bottom">
+      <div class="footer1_copyright">
+        {copyrightText || defaultCopyright}
+      </div>
+
+      {hasNav && (
+        <nav class="footer1_nav">
+          <slot name="nav" />
+        </nav>
+      )}
+
+      {hasSocial && (
+        <div class="footer1_social">
+          <slot name="social" />
+        </div>
+      )}
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer1 {
+    width: 100%;
+    background-color: var(--footer1-bg, var(--color-bg-secondary));
+    border-top: var(--footer1-border-width, 1px) solid
+                var(--footer1-border-color, var(--color-border-default));
+  }
+
+  .footer1_container {
+    max-width: var(--container-max-width);
+    margin: 0 auto;
+    padding: var(--footer1-padding, var(--space-12) var(--container-padding));
+  }
+
+  /* Main content area (for link columns, newsletter, etc.) */
+  .footer1_content {
+    margin-bottom: var(--footer1-content-margin, var(--space-8));
+    padding-bottom: var(--footer1-content-padding, var(--space-8));
+    border-bottom: 1px solid var(--footer1-divider-color, var(--color-border-default));
+  }
+
+  /* Bottom bar with copyright, nav, and social */
+  .footer1_bottom {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--footer1-bottom-gap, var(--space-4));
+  }
+
+  /* Copyright text */
+  .footer1_copyright {
+    font-family: var(--footer1-font-family, var(--font-family-sans));
+    font-size: var(--footer1-copyright-size, var(--font-size-sm));
+    color: var(--footer1-copyright-color, var(--color-text-secondary));
+  }
+
+  /* Footer navigation */
+  .footer1_nav {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--footer1-nav-gap, var(--space-6));
+  }
+
+  .footer1_nav :global(a) {
+    font-size: var(--footer1-link-size, var(--font-size-sm));
+    color: var(--footer1-link-color, var(--color-text-secondary));
+    text-decoration: var(--footer1-link-decoration, none);
+    transition: color var(--transition-fast);
+  }
+
+  .footer1_nav :global(a:hover) {
+    color: var(--footer1-link-hover-color, var(--color-text-primary));
+    text-decoration: var(--footer1-link-hover-decoration, underline);
+  }
+
+  /* Social links */
+  .footer1_social {
+    display: flex;
+    align-items: center;
+    gap: var(--footer1-social-gap, var(--space-4));
+  }
+
+  .footer1_social :global(a) {
+    color: var(--footer1-social-color, var(--color-text-secondary));
+    transition: color var(--transition-fast);
+  }
+
+  .footer1_social :global(a:hover) {
+    color: var(--footer1-social-hover-color, var(--color-text-primary));
+  }
+
+  /* Responsive */
+  @media (max-width: 639px) {
+    .footer1_bottom {
+      flex-direction: column;
+      text-align: center;
+    }
+
+    .footer1_nav {
+      justify-content: center;
+    }
+
+    .footer1_social {
+      justify-content: center;
+    }
+  }
+</style>
