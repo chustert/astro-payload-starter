@@ -1,14 +1,22 @@
 {
-  "name": "astro-starter",
-  "type": "module",
-  "version": "0.0.1",
+  "name": "astro-starter-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*"
+  ],
   "scripts": {
-    "dev": "astro dev",
-    "build": "astro build",
-    "preview": "astro preview",
-    "astro": "astro"
+    "dev": "npm run dev --workspace=apps/astro",
+    "dev:payload": "npm run dev --workspace=apps/payload-cms",
+    "dev:astro": "npm run dev --workspace=apps/astro",
+    "build": "npm run build --workspace=apps/astro",
+    "build:payload": "npm run build --workspace=apps/payload-cms",
+    "preview": "npm run preview --workspace=apps/astro",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down"
   },
-  "dependencies": {
-    "astro": "^5.16.12"
+  "devDependencies": {},
+  "engines": {
+    "node": ">=18.0.0"
   }
 }

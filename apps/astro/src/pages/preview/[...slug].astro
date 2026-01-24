@@ -1,0 +1,76 @@
+---
+/**
+ * Live Preview Route for Pages
+ * 
+ * This route is used by Payload CMS Live Preview to display draft content
+ * in an iframe with real-time updates.
+ */
+import BaseLayout from '@templates/BaseLayout.astro';
+import BlockRenderer from '@components/BlockRenderer.astro';
+import { getPageBySlugPreview } from '@lib/payload';
+
+// Disable prerendering for preview routes
+export const prerender = false;
+
+// Get the slug from the URL
+const { slug } = Astro.params;
+
+// Fetch the page (including draft content)
+const page = slug ? await getPageBySlugPreview(slug) : null;
+
+// If no page found, show error
+if (!page) {
+  return new Response('Page not found', { status: 404 });
+}
+---
+
+<BaseLayout 
+  title={page.meta?.title || page.title}
+  description={page.meta?.description}
+  hideHeader={false}
+  hideFooter={false}
+>
+  <main id="preview-content">
+    <BlockRenderer blocks={page.blocks} />
+  </main>
+</BaseLayout>
+
+<script>
+  // Live Preview integration script
+  // Listens for messages from Payload admin to refresh content
+  
+  interface LivePreviewMessage {
+    type: 'payload-live-preview';
+    data: any;
+  }
+
+  window.addEventListener('message', (event) => {
+    // Verify origin if needed for security
+    if (event.data?.type === 'payload-live-preview') {
+      // Refresh the page to show updated content
+      window.location.reload();
+    }
+  });
+</script>
+
+<style>
+  /* Preview mode indicator */
+  main#preview-content {
+    position: relative;
+  }
+  
+  main#preview-content::before {
+    content: 'PREVIEW MODE';
+    position: fixed;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #f59e0b;
+    color: black;
+    font-size: 10px;
+    font-weight: bold;
+    padding: 2px 8px;
+    z-index: 9999;
+    border-radius: 0 0 4px 4px;
+  }
+</style>

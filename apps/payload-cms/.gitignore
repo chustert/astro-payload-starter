@@ -1,0 +1,25 @@
+# Dependencies
+node_modules
+
+# Build output
+.next
+dist
+
+# Generated files
+src/payload-types.ts
+src/app/(payload)/admin/importMap.js
+
+# Media uploads
+media
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+
+# IDE
+.idea
+.vscode

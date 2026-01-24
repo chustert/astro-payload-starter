@@ -1,0 +1,404 @@
+---
+/**
+ * BlockRenderer Component
+ *
+ * Dynamically renders Payload CMS blocks using the corresponding Astro organisms.
+ * Each block type is mapped to its respective organism component.
+ *
+ * @example
+ * <BlockRenderer blocks={page.blocks} />
+ */
+
+import type {
+  PayloadBlock,
+  Hero1Block,
+  CTA1Block,
+  CTA2Block,
+  Feature1Block,
+  Layout1Block,
+  Stats1Block,
+  Team1Block,
+  SectionBlock,
+  Blog1Block,
+  CategoryGrid1Block,
+  FAQ1Block,
+  PayloadButton,
+} from '@/lib/payload';
+import { getMediaUrl, getPosts, getPostsByCategory, getCategoriesWithPostCounts, getCategories } from '@/lib/payload';
+
+// Import all organism components
+import Hero1 from '@organisms/Hero1.astro';
+import CTA1 from '@organisms/CTA1.astro';
+import CTA2 from '@organisms/CTA2.astro';
+import Feature1 from '@organisms/Feature1.astro';
+import Layout1 from '@organisms/Layout1.astro';
+import Stats1 from '@organisms/Stats1.astro';
+import Team1 from '@organisms/Team1.astro';
+import Section from '@organisms/Section.astro';
+import Blog1 from '@organisms/Blog1.astro';
+import CategoryGrid1 from '@organisms/CategoryGrid1.astro';
+import FAQ1 from '@organisms/FAQ1.astro';
+import Button from '@atoms/Button.astro';
+import Card1 from '@molecules/Card1.astro';
+
+interface Props {
+  blocks: PayloadBlock[];
+}
+
+const { blocks } = Astro.props;
+
+/**
+ * Helper to render buttons from Payload block data
+ */
+function renderButtons(buttons: PayloadButton[] | undefined) {
+  if (!buttons || buttons.length === 0) return null;
+  return buttons;
+}
+
+/**
+ * Fetch posts for Blog1 block based on its configuration
+ */
+async function fetchPostsForBlog1Block(block: Blog1Block) {
+  const limit = block.limit || 6;
+
+  switch (block.postSource) {
+    case 'category':
+      if (block.category && typeof block.category === 'object') {
+        return await getPostsByCategory(block.category.slug, limit);
+      }
+      return [];
+
+    case 'specific':
+      // Posts are already populated in the block
+      return block.posts || [];
+
+    case 'latest':
+    default:
+      return await getPosts(limit);
+  }
+}
+
+// Pre-fetch posts for all Blog1 blocks
+const blogBlockPosts = new Map<string, any[]>();
+for (const block of blocks) {
+  if (block.blockType === 'blog1') {
+    const posts = await fetchPostsForBlog1Block(block as Blog1Block);
+    blogBlockPosts.set(block.id, posts);
+  }
+}
+
+/**
+ * Fetch categories for CategoryGrid1 block based on its configuration
+ */
+async function fetchCategoriesForCategoryGrid1Block(block: CategoryGrid1Block) {
+  if (block.categorySource === 'specific' && block.categories) {
+    // Use the pre-populated categories, but we need post counts
+    const allCategoriesWithCounts = await getCategoriesWithPostCounts();
+    const categoryIds = block.categories.map(c => 
+      typeof c === 'object' ? c.id : c
+    );
+    return allCategoriesWithCounts.filter(c => categoryIds.includes(c.id));
+  }
+  
+  // Default: all categories with post counts
+  return await getCategoriesWithPostCounts();
+}
+
+// Pre-fetch categories for all CategoryGrid1 blocks
+const categoryGridBlockCategories = new Map<string, any[]>();
+for (const block of blocks) {
+  if (block.blockType === 'categoryGrid1') {
+    const categories = await fetchCategoriesForCategoryGrid1Block(block as CategoryGrid1Block);
+    categoryGridBlockCategories.set(block.id, categories);
+  }
+}
+---
+
+{blocks.map((block) => {
+  // Extract common section props
+  const sectionProps = {
+    size: block.size,
+    paddingTop: block.paddingTop,
+    paddingBottom: block.paddingBottom,
+    background: block.background,
+  };
+
+  switch (block.blockType) {
+    case 'hero1': {
+      const hero = block as Hero1Block;
+      const mediaUrl = getMediaUrl(hero.media);
+      const buttons = renderButtons(hero.buttons);
+
+      return (
+        <Hero1
+          tagline={hero.tagline}
+          heading={hero.heading}
+          description={hero.description}
+          align={hero.align}
+          contentWidth={hero.contentWidth}
+          {...sectionProps}
+        >
+          {buttons && buttons.map((btn) => (
+            <Button variant={btn.variant} as="a" href={btn.href}>
+              {btn.label}
+            </Button>
+          ))}
+          {mediaUrl && (
+            <img slot="media" src={mediaUrl} alt={hero.media?.alt || ''} />
+          )}
+        </Hero1>
+      );
+    }
+
+    case 'cta1': {
+      const cta = block as CTA1Block;
+      const buttons = renderButtons(cta.buttons);
+
+      return (
+        <CTA1
+          heading={cta.heading}
+          description={cta.description}
+          align={cta.align}
+          {...sectionProps}
+        >
+          {buttons && buttons.map((btn) => (
+            <Button variant={btn.variant} as="a" href={btn.href}>
+              {btn.label}
+            </Button>
+          ))}
+        </CTA1>
+      );
+    }
+
+    case 'cta2': {
+      const cta = block as CTA2Block;
+      const imageUrl = getMediaUrl(cta.image);
+      const buttons = renderButtons(cta.buttons);
+
+      return (
+        <CTA2
+          heading={cta.heading}
+          description={cta.description}
+          imageSrc={imageUrl}
+          imageAlt={cta.image?.alt}
+          reverse={cta.reverse}
+          verticalAlign={cta.verticalAlign}
+          {...sectionProps}
+        >
+          {buttons && buttons.map((btn) => (
+            <Button variant={btn.variant} as="a" href={btn.href}>
+              {btn.label}
+            </Button>
+          ))}
+        </CTA2>
+      );
+    }
+
+    case 'feature1': {
+      const feature = block as Feature1Block;
+      
+      return (
+        <Feature1
+          title={feature.title}
+          subtitle={feature.subtitle}
+          features={feature.features}
+          columns={feature.columns ? parseInt(feature.columns) as 2 | 3 | 4 : 3}
+          cardVariant={feature.cardVariant}
+          centerHeading={feature.centerHeading}
+          centerCards={feature.centerCards}
+          {...sectionProps}
+        />
+      );
+    }
+
+    case 'layout1': {
+      const layout = block as Layout1Block;
+      const buttons = renderButtons(layout.buttons);
+      const imageUrl = getMediaUrl(layout.image);
+
+      return (
+        <Layout1
+          tagline={layout.tagline}
+          heading={layout.heading}
+          description={layout.description}
+          reverse={layout.reverse}
+          {...sectionProps}
+        >
+          {layout.contentText && (
+            <div set:html={layout.contentText} />
+          )}
+          {buttons && buttons.map((btn) => (
+            <Button variant={btn.variant} as="a" href={btn.href}>
+              {btn.label}
+            </Button>
+          ))}
+          {layout.mediaType === 'image' && imageUrl && (
+            <img slot="media" src={imageUrl} alt={layout.image?.alt || ''} />
+          )}
+          {layout.mediaType === 'code' && layout.codeBlock && (
+            <Card1 slot="media" variant="filled" class="p-8">
+              <pre class="mb-0"><code>{layout.codeBlock}</code></pre>
+            </Card1>
+          )}
+        </Layout1>
+      );
+    }
+
+    case 'section': {
+      const section = block as SectionBlock;
+
+      return (
+        <Section
+          centerHeading={section.centerContent}
+          {...sectionProps}
+        >
+          <div 
+            class={section.maxWidth === 'narrow' ? 'max-w-prose mx-auto' : section.maxWidth === 'medium' ? 'max-w-4xl mx-auto' : ''}
+            style={section.centerContent ? 'text-align: center;' : ''}
+            set:html={section.content}
+          />
+        </Section>
+      );
+    }
+
+    case 'stats1': {
+      const stats = block as Stats1Block;
+
+      return (
+        <Stats1
+          title={stats.title}
+          subtitle={stats.subtitle}
+          stats={stats.stats}
+          columns={stats.columns ? parseInt(stats.columns) as 2 | 3 | 4 : 4}
+          centered={stats.centered}
+          {...sectionProps}
+        />
+      );
+    }
+
+    case 'team1': {
+      const team = block as Team1Block;
+
+      // Transform members to include media URLs
+      const members = team.members.map((member) => ({
+        name: member.name,
+        role: member.role,
+        image: getMediaUrl(member.image),
+        bio: member.bio,
+      }));
+
+      return (
+        <Team1
+          title={team.title}
+          subtitle={team.subtitle}
+          members={members}
+          columns={team.columns ? parseInt(team.columns) as 2 | 3 | 4 : 4}
+          avatarSize={team.avatarSize}
+          centered={team.centered}
+          {...sectionProps}
+        />
+      );
+    }
+
+    case 'blog1': {
+      const blog = block as Blog1Block;
+      const posts = blogBlockPosts.get(block.id) || [];
+
+      // Transform posts to match Blog1 component format
+      const transformedPosts = posts.map((post) => ({
+        slug: post.slug,
+        data: {
+          title: post.title,
+          description: post.description,
+          pubDate: new Date(post.pubDate),
+          heroImage: getMediaUrl(post.heroImage),
+          author: post.author,
+        },
+        category: post.category ? {
+          slug: post.category.slug,
+          data: {
+            name: post.category.name,
+            color: post.category.color,
+          },
+        } : undefined,
+      }));
+
+      return (
+        <Blog1
+          title={blog.title}
+          subtitle={blog.subtitle}
+          posts={transformedPosts}
+          columns={blog.columns ? parseInt(blog.columns) as 2 | 3 : 3}
+          cardVariant={blog.cardVariant}
+          centerHeading={blog.centerHeading}
+          {...sectionProps}
+        />
+      );
+    }
+
+    case 'categoryGrid1': {
+      const grid = block as CategoryGrid1Block;
+      const categories = categoryGridBlockCategories.get(block.id) || [];
+
+      // Transform categories to match CategoryGrid1 component format
+      const transformedCategories = categories.map((category) => ({
+        slug: category.slug,
+        data: {
+          name: category.name,
+          description: category.description,
+          color: category.color,
+        },
+        postCount: grid.showPostCount !== false ? category.postCount : undefined,
+      }));
+
+      return (
+        <CategoryGrid1
+          title={grid.title}
+          subtitle={grid.subtitle}
+          categories={transformedCategories}
+          columns={grid.columns ? parseInt(grid.columns) as 2 | 3 : 2}
+          cardVariant={grid.cardVariant}
+          centerHeading={grid.centerHeading}
+          {...sectionProps}
+        />
+      );
+    }
+
+    case 'faq1': {
+      const faq = block as FAQ1Block;
+
+      // Transform bottom CTA buttons
+      const bottomCta = faq.bottomCta ? {
+        heading: faq.bottomCta.heading,
+        description: faq.bottomCta.description,
+        buttons: faq.bottomCta.buttons,
+      } : undefined;
+
+      return (
+        <FAQ1
+          title={faq.title}
+          subtitle={faq.subtitle}
+          items={faq.items}
+          showBottomCta={faq.showBottomCta}
+          bottomCta={bottomCta}
+          centerHeading={faq.centerHeading}
+          maxWidth={faq.maxWidth}
+          defaultOpenFirst={faq.defaultOpenFirst}
+          allowMultipleOpen={faq.allowMultipleOpen}
+          {...sectionProps}
+        />
+      );
+    }
+
+    default:
+      // Unknown block type - render a placeholder in development
+      if (import.meta.env.DEV) {
+        return (
+          <div style="padding: 2rem; background: #fee2e2; border: 2px dashed #ef4444; text-align: center;">
+            <strong>Unknown block type:</strong> {(block as any).blockType}
+          </div>
+        );
+      }
+      return null;
+  }
+})}

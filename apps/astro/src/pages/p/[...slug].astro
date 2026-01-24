@@ -1,0 +1,51 @@
+---
+/**
+ * Dynamic Page Route for Payload CMS Pages
+ *
+ * Renders pages built with the Payload visual block editor.
+ * Server-rendered to always fetch fresh content from Payload CMS.
+ *
+ * Route: /p/[slug]
+ * Example: /p/about, /p/services/consulting
+ */
+
+import BaseLayout from '@templates/BaseLayout.astro';
+import BlockRenderer from '@components/BlockRenderer.astro';
+import { getPageBySlug, getMediaUrl } from '@lib/payload';
+import type { PayloadPage } from '@lib/payload';
+
+// Server-render this page to fetch from CMS on each request
+export const prerender = false;
+
+// Fetch page from Payload CMS
+const slug = Astro.params.slug;
+let page: PayloadPage | null = null;
+
+if (slug) {
+  try {
+    page = await getPageBySlug(slug);
+  } catch (error) {
+    console.error('Error fetching page from Payload:', error);
+  }
+}
+
+// 404 if page not found
+if (!page) {
+  return Astro.redirect('/404');
+}
+
+// SEO metadata
+const title = page.meta?.title || page.title;
+const description = page.meta?.description;
+const ogImage = page.meta?.image ? getMediaUrl(page.meta.image) : undefined;
+---
+
+<BaseLayout 
+  title={title}
+  description={description}
+  ogImage={ogImage}
+>
+  <main>
+    <BlockRenderer blocks={page.blocks} />
+  </main>
+</BaseLayout>

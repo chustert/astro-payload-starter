@@ -1,0 +1,19 @@
+# MongoDB service commented out - now using MongoDB Atlas
+# Uncomment if you need to run MongoDB locally again
+#services:
+#  mongodb:
+#    image: mongo:7
+#    container_name: payload-mongodb
+#    ports:
+#      - "27017:27017"
+#    volumes:
+#      - mongodb_data:/data/db
+#    environment:
+#      MONGO_INITDB_DATABASE: payload-cms
+#    restart: unless-stopped
+#
+#volumes:
+#  mongodb_data:
+#    driver: local
+
+services: {}

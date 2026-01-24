@@ -1,0 +1,189 @@
+---
+/**
+ * BaseLayout Component (Template)
+ *
+ * The foundation layout template for all pages.
+ * Includes HTML structure, meta tags, and common page elements.
+ *
+ * @example
+ * ---
+ * import BaseLayout from '@/components/templates/BaseLayout.astro';
+ * ---
+ *
+ * <BaseLayout title="Home" description="Welcome to my site">
+ *   <main>Page content here</main>
+ * </BaseLayout>
+ *
+ * @customization
+ * Override CSS variables in your main.css to customize.
+ */
+
+interface Props {
+  /** Page title (appears in browser tab) */
+  title: string;
+  /** Page meta description */
+  description?: string;
+  /** Open Graph image URL */
+  ogImage?: string;
+  /** Canonical URL */
+  canonicalUrl?: string;
+  /** Additional classes for body */
+  bodyClass?: string;
+  /** Disable default header */
+  hideHeader?: boolean;
+  /** Disable default footer */
+  hideFooter?: boolean;
+  /** Use CMS-managed navigation instead of static (defaults to true) */
+  useCmsNav?: boolean;
+}
+
+import '@styles/main.css';
+import Header1 from '@organisms/Header1.astro';
+import Footer1 from '@organisms/Footer1.astro';
+import NavLink from '@molecules/NavLink.astro';
+import { getNavigation, type NavigationItem } from '@lib/payload';
+
+const {
+  title,
+  description = 'A modern Astro starter template with a vanilla CSS design system.',
+  ogImage = '/og-image.png',
+  canonicalUrl,
+  bodyClass = '',
+  hideHeader = false,
+  hideFooter = false,
+  useCmsNav = true,
+} = Astro.props;
+
+// Site configuration - customize these for your project
+const siteConfig = {
+  name: 'Astro Starter',
+  url: Astro.site || 'https://example.com',
+};
+
+// Default navigation (used if CMS nav is disabled or unavailable)
+const defaultHeaderNav: NavigationItem[] = [
+  { label: 'Home', href: '/' },
+  { label: 'About', href: '/about' },
+  { label: 'Blog', href: '/blog' },
+  { label: 'Categories', href: '/categories' },
+  { label: 'Style Guide', href: '/style-guide' },
+];
+
+const defaultFooterNav: NavigationItem[] = [
+  { label: 'Privacy', href: '/privacy' },
+  { label: 'Terms', href: '/terms' },
+];
+
+// Fetch CMS navigation if enabled
+let headerNav = defaultHeaderNav;
+let footerNav = defaultFooterNav;
+
+if (useCmsNav) {
+  try {
+    const cmsNav = await getNavigation();
+    if (cmsNav?.header?.items?.length) {
+      headerNav = cmsNav.header.items;
+    }
+    if (cmsNav?.footer?.items?.length) {
+      footerNav = cmsNav.footer.items;
+    }
+  } catch (error) {
+    console.warn('Failed to fetch CMS navigation, using defaults');
+  }
+}
+
+const fullTitle = title ? `${title} | ${siteConfig.name}` : siteConfig.name;
+const canonical = canonicalUrl || Astro.url.href;
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Primary Meta Tags -->
+    <title>{fullTitle}</title>
+    <meta name="title" content={fullTitle} />
+    <meta name="description" content={description} />
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href={canonical} />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImage} />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content={canonical} />
+    <meta property="twitter:title" content={fullTitle} />
+    <meta property="twitter:description" content={description} />
+    <meta property="twitter:image" content={ogImage} />
+
+    <!-- Generator -->
+    <meta name="generator" content={Astro.generator} />
+
+    <!-- Additional head content -->
+    <slot name="head" />
+  </head>
+
+  <body class={bodyClass}>
+    {!hideHeader && (
+      <Header1 siteName={siteConfig.name} sticky>
+        <nav slot="nav">
+          {headerNav.map((item) => (
+            <NavLink 
+              href={item.href} 
+              target={item.newTab ? '_blank' : undefined}
+              rel={item.newTab ? 'noopener noreferrer' : undefined}
+            >
+              {item.label}
+            </NavLink>
+          ))}
+        </nav>
+      </Header1>
+    )}
+
+    <slot />
+
+    {!hideFooter && (
+      <Footer1 siteName={siteConfig.name}>
+        <nav slot="nav">
+          {footerNav.map((item) => (
+            <a 
+              href={item.href}
+              target={item.newTab ? '_blank' : undefined}
+              rel={item.newTab ? 'noopener noreferrer' : undefined}
+            >
+              {item.label}
+            </a>
+          ))}
+        </nav>
+      </Footer1>
+    )}
+
+    <!-- Additional body scripts -->
+    <slot name="scripts" />
+  </body>
+</html>
+
+<style is:global>
+  /* Page layout */
+  body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  /* Main content should grow to fill available space */
+  main {
+    flex: 1;
+  }
+</style>

@@ -1,633 +1,409 @@
-# Astro Starter with Vanilla CSS Design System
+# Astro Starter with Payload CMS
 
-A minimal, unstyled Astro starter template featuring an atomic design component library and a vanilla CSS design system. Built for developers who want full control over their styling without framework dependencies.
+A monorepo featuring an Astro frontend with an atomic design component library and Payload CMS for visual page building. Uses MongoDB Atlas for cloud database hosting.
+
+## Architecture
+
+```
+astro-starter/
+├── apps/
+│   ├── astro/           # Astro frontend (port 4321)
+│   └── payload-cms/     # Payload CMS backend on Next.js (port 3000)
+├── docs/                # Additional documentation
+├── docker-compose.yml   # Optional local MongoDB (disabled by default)
+└── package.json         # Workspace configuration
+```
 
 ## Features
 
+- **Visual Page Builder** - Build pages by composing components in Payload CMS
+- **Live Preview** - See changes in real-time while editing in Payload Admin
 - **Atomic Design Architecture** - Components organized into atoms, molecules, organisms, and templates
 - **Vanilla CSS Design System** - No Tailwind, no CSS-in-JS, just pure CSS with custom properties
-- **Fully Customizable** - Override any design token or component style via CSS variables
-- **Zero Runtime Dependencies** - Only Astro as a dependency
-- **Copy-Paste Components** - Each component is self-contained and documented
-- **Built-in Style Guide** - Visual documentation of all components and tokens
+- **CMS-Managed Navigation** - Header and footer navigation configurable through Payload
+- **MongoDB Atlas** - Cloud-hosted database for easy deployment and scalability
+- **Type-Safe** - TypeScript throughout with Payload-generated types
+- **SSR Support** - Server-side rendering for dynamic CMS content
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|------------|
+| Frontend | Astro 5.x |
+| CMS | Payload CMS 3.x (on Next.js 15) |
+| Database | MongoDB Atlas (cloud) |
+| Rich Text | Lexical Editor |
+| Image Processing | Sharp |
 
 ## Quick Start
 
-```bash
-# Install dependencies
-npm install
+### Prerequisites
 
-# Start development server
-npm run dev
+- Node.js 18+
+- MongoDB Atlas account (free tier available)
 
-# Build for production
-npm run build
+### 1. Set Up MongoDB Atlas
 
-# Preview production build
-npm run preview
+1. Create a free cluster at [MongoDB Atlas](https://www.mongodb.com/atlas)
+2. Create a database user with read/write access
+3. Add your IP address to the network access list (or use 0.0.0.0/0 for development)
+4. Get your connection string (looks like `mongodb+srv://user:password@cluster.mongodb.net/payload-cms`)
+
+### 2. Configure Environment
+
+Create `apps/payload-cms/.env`:
+
+```env
+MONGODB_URI=mongodb+srv://your-connection-string
+PAYLOAD_SECRET=your-secret-key-min-32-chars
+PAYLOAD_PUBLIC_SERVER_URL=http://localhost:3000
+ASTRO_URL=http://localhost:4321
+PORT=3000
 ```
 
-Open [http://localhost:4321](http://localhost:4321) to see the demo homepage.
+Create `apps/astro/.env`:
 
-Visit [http://localhost:4321/style-guide](http://localhost:4321/style-guide) to explore all components.
+```env
+PAYLOAD_URL=http://localhost:3000
+```
+
+### 3. Install Dependencies
+
+```bash
+npm install
+```
+
+### 4. Start Development Servers
+
+```bash
+# Terminal 1: Start Payload CMS
+npm run dev:payload
+
+# Terminal 2: Start Astro
+npm run dev:astro
+```
+
+- **Astro Frontend**: http://localhost:4321
+- **Payload Admin**: http://localhost:3000/admin
+
+### 5. Create First Admin User
+
+1. Open http://localhost:3000/admin
+2. Create your admin account
+3. Start building pages!
 
 ## Project Structure
 
+### Astro Frontend (`apps/astro/`)
+
 ```
-src/
-├── components/
-│   ├── atoms/              # Basic building blocks
-│   │   ├── Button.astro    # Buttons with variants & sizes
-│   │   ├── Input.astro     # Form inputs & textareas
-│   │   ├── Badge.astro     # Status labels & tags
-│   │   ├── Text.astro      # Typography component
-│   │   └── index.ts        # Barrel export
-│   │
-│   ├── molecules/          # Combinations of atoms
-│   │   ├── Card.astro      # Content container with slots
-│   │   ├── FormField.astro # Label + input + helper text
-│   │   ├── NavLink.astro   # Navigation link with active state
-│   │   └── index.ts
-│   │
-│   ├── organisms/          # Complex UI sections
-│   │   ├── Header.astro    # Site header with nav
-│   │   ├── Footer.astro    # Site footer
-│   │   ├── Section.astro   # Page section wrapper
-│   │   └── index.ts
-│   │
-│   └── templates/          # Page-level layouts
-│       ├── BaseLayout.astro # HTML document structure
-│       └── index.ts
-│
-├── styles/
-│   ├── design-system/
-│   │   ├── tokens.css      # Design tokens (colors, spacing, etc.)
-│   │   ├── typography.css  # Text styles & prose
-│   │   ├── spacing.css     # Margin, padding, gap utilities
-│   │   └── layout.css      # Flexbox, grid, container utilities
-│   │
-│   ├── base/
-│   │   ├── reset.css       # Modern CSS reset
-│   │   └── global.css      # Base element styles
-│   │
-│   └── main.css            # Entry point (imports all styles)
-│
-└── pages/
-    ├── index.astro         # Demo homepage
-    └── style-guide.astro   # Component documentation
+apps/astro/
+├── src/
+│   ├── components/
+│   │   ├── atoms/           # Button, Input, Badge, Avatar, Text
+│   │   ├── molecules/       # Card1-3, BlogCard1, NavLink, etc.
+│   │   ├── organisms/       # Hero1, CTA1-2, Feature1, Blog1, etc.
+│   │   ├── templates/       # BaseLayout, MinimalLayout
+│   │   └── BlockRenderer.astro  # Maps Payload blocks to Astro components
+│   ├── lib/
+│   │   └── payload.ts       # Payload API client with TypeScript types
+│   ├── content/             # Local content collections (blog, categories)
+│   ├── pages/
+│   │   ├── [...slug].astro      # Dynamic pages from Payload (root-level)
+│   │   ├── p/[...slug].astro    # Alternative route for Payload pages
+│   │   ├── blog/[...slug].astro # Blog post pages
+│   │   ├── category/[...slug].astro # Category archive pages
+│   │   └── preview/             # Live preview routes
+│   │       ├── [...slug].astro
+│   │       ├── p/[...slug].astro
+│   │       └── blog/[...slug].astro
+│   └── styles/
+│       ├── design-system/   # CSS tokens, typography, spacing, layout
+│       └── base/            # Reset and global styles
 ```
 
-## Design System
+### Payload CMS (`apps/payload-cms/`)
 
-### Design Tokens
-
-All visual properties are defined as CSS custom properties in `src/styles/design-system/tokens.css`. This single file controls the entire look and feel of your site.
-
-#### Colors
-
-```css
-/* Primary palette */
---color-primary-50 through --color-primary-950
-
-/* Neutral palette */
---color-neutral-0 through --color-neutral-950
-
-/* Semantic colors */
---color-success-{50,500,700}
---color-warning-{50,500,700}
---color-error-{50,500,700}
-
-/* Semantic assignments */
---color-text-primary, --color-text-secondary, --color-text-tertiary
---color-bg-primary, --color-bg-secondary, --color-bg-tertiary
---color-border-default, --color-border-strong, --color-border-focus
+```
+apps/payload-cms/
+├── src/
+│   ├── app/(payload)/       # Next.js App Router for Payload Admin
+│   ├── collections/
+│   │   ├── Pages.ts         # Visual page builder with blocks
+│   │   ├── Posts.ts         # Blog posts with rich text
+│   │   ├── Categories.ts    # Blog categories
+│   │   ├── Media.ts         # Image/file uploads
+│   │   └── Users.ts         # Admin users
+│   ├── globals/
+│   │   └── Navigation.ts    # Site-wide header/footer navigation
+│   ├── blocks/              # Visual page builder blocks
+│   │   ├── Hero1Block.ts
+│   │   ├── CTA1Block.ts
+│   │   ├── CTA2Block.ts
+│   │   ├── Feature1Block.ts
+│   │   ├── Layout1Block.ts
+│   │   ├── Stats1Block.ts
+│   │   ├── Team1Block.ts
+│   │   ├── Blog1Block.ts
+│   │   ├── CategoryGrid1Block.ts
+│   │   ├── SectionBlock.ts
+│   │   └── shared.ts        # Common block fields
+│   ├── fields/
+│   │   └── slugField.ts     # Reusable slug field with auto-generation
+│   └── payload.config.ts    # Main Payload configuration
 ```
 
-#### Spacing
-
-Based on a 4px grid system:
-
-```css
---space-1: 0.25rem;   /* 4px */
---space-2: 0.5rem;    /* 8px */
---space-3: 0.75rem;   /* 12px */
---space-4: 1rem;      /* 16px */
---space-6: 1.5rem;    /* 24px */
---space-8: 2rem;      /* 32px */
-/* ... up to --space-32 */
-```
-
-#### Typography
-
-```css
-/* Font families */
---font-family-sans
---font-family-serif
---font-family-mono
-
-/* Font sizes (modular scale) */
---font-size-xs through --font-size-6xl
-
-/* Font weights */
---font-weight-light, normal, medium, semibold, bold
-
-/* Line heights */
---line-height-none, tight, snug, normal, relaxed, loose
-```
-
-#### Other Tokens
-
-```css
-/* Border radius */
---radius-sm, md, lg, xl, 2xl, 3xl, full
-
-/* Shadows */
---shadow-xs, sm, md, lg, xl, 2xl
-
-/* Transitions */
---transition-fast, normal, slow
-
-/* Z-index scale */
---z-dropdown, sticky, fixed, modal, popover, tooltip
-```
-
-### Customization
-
-#### Global Customization
-
-Override tokens in `tokens.css` or create a new file and import it after `tokens.css` in `main.css`:
-
-```css
-/* src/styles/overrides/brand.css */
-:root {
-  /* Change the entire color scheme */
-  --color-primary-500: #6366f1;
-  --color-primary-600: #4f46e5;
-  --color-primary-700: #4338ca;
-
-  /* Change typography */
-  --font-family-sans: 'Inter', system-ui, sans-serif;
-
-  /* Adjust spacing scale */
-  --space-4: 1.125rem;
-}
-```
-
-#### Component-Level Customization
-
-Each component exposes its own CSS variables for fine-grained control:
-
-```css
-/* Customize buttons globally */
-:root {
-  --btn-border-radius: var(--radius-full);
-  --btn-font-weight: var(--font-weight-semibold);
-  --btn-primary-bg: var(--color-primary-500);
-  --btn-primary-bg-hover: var(--color-primary-600);
-}
-
-/* Customize cards */
-:root {
-  --card-border-radius: var(--radius-xl);
-  --card-padding: var(--space-8);
-  --card-elevated-shadow: var(--shadow-lg);
-}
-```
-
-#### Per-Instance Customization
-
-Override variables inline for specific instances:
-
-```astro
-<Button
-  style="--btn-primary-bg: #10b981; --btn-border-radius: 0;"
->
-  Custom Button
-</Button>
-```
-
-## Components
-
-### Atoms
-
-#### Button
-
-```astro
----
-import Button from '@atoms/Button.astro';
----
-
-<!-- Variants -->
-<Button variant="primary">Primary</Button>
-<Button variant="secondary">Secondary</Button>
-<Button variant="ghost">Ghost</Button>
-
-<!-- Sizes -->
-<Button size="sm">Small</Button>
-<Button size="md">Medium</Button>
-<Button size="lg">Large</Button>
-
-<!-- As link -->
-<Button as="a" href="/about">Link Button</Button>
-
-<!-- States -->
-<Button disabled>Disabled</Button>
-<Button fullWidth>Full Width</Button>
-```
-
-**CSS Variables:**
-- `--btn-font-family`, `--btn-font-weight`, `--btn-border-radius`
-- `--btn-padding-{sm,md,lg}`, `--btn-font-size-{sm,md,lg}`
-- `--btn-{primary,secondary,ghost}-bg`, `--btn-{variant}-color`, `--btn-{variant}-border`
-- `--btn-{variant}-bg-hover`, `--btn-{variant}-border-hover`
-
-#### Input
-
-```astro
----
-import Input from '@atoms/Input.astro';
----
-
-<Input name="email" type="email" placeholder="Enter email" />
-<Input name="message" as="textarea" rows={4} />
-<Input name="search" size="lg" />
-<Input name="error-field" error />
-```
-
-**CSS Variables:**
-- `--input-font-family`, `--input-border-radius`, `--input-border-width`
-- `--input-padding-{sm,md,lg}`, `--input-font-size-{sm,md,lg}`
-- `--input-bg`, `--input-color`, `--input-border-color`
-- `--input-focus-border-color`, `--input-focus-ring-color`
-- `--input-error-border-color`, `--input-error-ring-color`
-
-#### Badge
-
-```astro
----
-import Badge from '@atoms/Badge.astro';
----
-
-<Badge>Default</Badge>
-<Badge variant="primary">Primary</Badge>
-<Badge variant="success">Success</Badge>
-<Badge variant="warning">Warning</Badge>
-<Badge variant="error">Error</Badge>
-
-<Badge size="sm">Small</Badge>
-<Badge size="lg">Large</Badge>
-```
-
-#### Text
-
-```astro
----
-import Text from '@atoms/Text.astro';
----
-
-<Text as="h1" variant="heading-1">Page Title</Text>
-<Text variant="body-large">Large body text</Text>
-<Text variant="caption" color="secondary">Caption text</Text>
-```
-
-### Molecules
-
-#### Card
-
-```astro
----
-import Card from '@molecules/Card.astro';
----
-
-<!-- Basic -->
-<Card>
-  <h3>Card Title</h3>
-  <p>Card content</p>
-</Card>
-
-<!-- With slots -->
-<Card>
-  <img slot="media" src="/image.jpg" alt="" />
-  <div slot="header">Header</div>
-  Content here
-  <div slot="footer">Footer</div>
-</Card>
-
-<!-- Variants -->
-<Card variant="elevated">Shadow elevation</Card>
-<Card variant="outlined">Border outline</Card>
-<Card variant="filled">Background fill</Card>
-
-<!-- Interactive -->
-<Card interactive>Clickable card</Card>
-<Card href="/page">Link card</Card>
-```
-
-#### FormField
-
-```astro
----
-import FormField from '@molecules/FormField.astro';
----
-
-<FormField
-  label="Email Address"
-  name="email"
-  type="email"
-  placeholder="you@example.com"
-  helperText="We'll never share your email."
-  required
-/>
-
-<FormField
-  label="Password"
-  name="password"
-  type="password"
-  errorText="Password must be at least 8 characters."
-/>
-
-<FormField
-  label="Message"
-  name="message"
-  as="textarea"
-  rows={4}
-/>
-```
-
-#### NavLink
-
-```astro
----
-import NavLink from '@molecules/NavLink.astro';
----
-
-<nav>
-  <NavLink href="/">Home</NavLink>
-  <NavLink href="/about">About</NavLink>
-  <NavLink href="/blog" exact={false}>Blog</NavLink>
-</nav>
-```
-
-### Organisms
-
-#### Header
-
-```astro
----
-import Header from '@organisms/Header.astro';
-import NavLink from '@molecules/NavLink.astro';
-import Button from '@atoms/Button.astro';
----
-
-<Header siteName="My Site" sticky>
-  <nav slot="nav">
-    <NavLink href="/">Home</NavLink>
-    <NavLink href="/about">About</NavLink>
-  </nav>
-  <div slot="actions">
-    <Button size="sm">Sign In</Button>
-  </div>
-</Header>
-```
-
-#### Footer
-
-```astro
----
-import Footer from '@organisms/Footer.astro';
----
-
-<Footer siteName="My Site">
-  <div slot="default">
-    <!-- Footer content columns -->
-  </div>
-  <nav slot="nav">
-    <a href="/privacy">Privacy</a>
-    <a href="/terms">Terms</a>
-  </nav>
-  <div slot="social">
-    <a href="https://twitter.com">Twitter</a>
-  </div>
-</Footer>
-```
-
-#### Section
-
-```astro
----
-import Section from '@organisms/Section.astro';
----
-
-<Section
-  title="Features"
-  subtitle="What we offer"
-  background="muted"
-  size="lg"
-  centerHeading
->
-  <!-- Section content -->
-</Section>
-```
-
-### Templates
-
-#### BaseLayout
-
-```astro
----
-import BaseLayout from '@templates/BaseLayout.astro';
----
-
-<BaseLayout
-  title="Page Title"
-  description="Page description for SEO"
->
-  <main>
-    <!-- Page content -->
-  </main>
-</BaseLayout>
-```
-
-## Path Aliases
-
-The project includes TypeScript path aliases for cleaner imports:
-
-```typescript
-// Available aliases
-@/*           → src/*
-@components/* → src/components/*
-@atoms/*      → src/components/atoms/*
-@molecules/*  → src/components/molecules/*
-@organisms/*  → src/components/organisms/*
-@templates/*  → src/components/templates/*
-@styles/*     → src/styles/*
-```
-
-Usage:
-
-```astro
----
-import Button from '@atoms/Button.astro';
-import Card from '@molecules/Card.astro';
-import Header from '@organisms/Header.astro';
-import BaseLayout from '@templates/BaseLayout.astro';
----
-```
-
-## Adding New Components
-
-### 1. Create the Component
-
-Create a new `.astro` file in the appropriate atomic level folder:
-
-```astro
----
-// src/components/atoms/Avatar.astro
-
-interface Props {
-  src: string;
-  alt: string;
-  size?: 'sm' | 'md' | 'lg';
-  class?: string;
-}
-
-const { src, alt, size = 'md', class: className = '' } = Astro.props;
----
-
-<img
-  class={`avatar avatar--${size} ${className}`}
-  src={src}
-  alt={alt}
-/>
-
-<style>
-  .avatar {
-    border-radius: var(--avatar-border-radius, var(--radius-full));
-    object-fit: cover;
-  }
-
-  .avatar--sm {
-    width: var(--avatar-size-sm, 32px);
-    height: var(--avatar-size-sm, 32px);
-  }
-
-  .avatar--md {
-    width: var(--avatar-size-md, 48px);
-    height: var(--avatar-size-md, 48px);
-  }
-
-  .avatar--lg {
-    width: var(--avatar-size-lg, 64px);
-    height: var(--avatar-size-lg, 64px);
-  }
-</style>
-```
-
-### 2. Export from Index
-
-Add to the barrel export file:
-
-```typescript
-// src/components/atoms/index.ts
-export { default as Avatar } from './Avatar.astro';
-```
-
-### 3. Document in Style Guide
-
-Add a section to `src/pages/style-guide.astro` showcasing the component.
-
-## Best Practices
-
-### Component Design
-
-1. **Use CSS variables with fallbacks** - Always provide a default value:
-   ```css
-   background: var(--btn-bg, var(--color-primary-600));
-   ```
-
-2. **Namespace component variables** - Prefix with component name:
-   ```css
-   --card-padding, --btn-border-radius, --input-focus-color
-   ```
-
-3. **Accept a `class` prop** - Allow consumers to add custom classes:
-   ```astro
-   const { class: className = '' } = Astro.props;
-   <div class={`component ${className}`}>
-   ```
-
-4. **Use slots for flexibility** - Let consumers control content structure:
-   ```astro
-   <slot name="header" />
-   <slot />
-   <slot name="footer" />
-   ```
-
-### CSS Organization
-
-1. **Tokens first** - Define all values in `tokens.css`
-2. **Semantic variables** - Map primitives to semantic uses
-3. **Component variables** - Reference semantic variables in components
-4. **Utility classes** - Use sparingly for common patterns
-
-### Accessibility
-
-1. **Focus states** - All interactive elements have visible focus styles
-2. **Color contrast** - Semantic colors meet WCAG AA standards
-3. **Reduced motion** - Animations respect `prefers-reduced-motion`
-4. **Semantic HTML** - Components use appropriate elements
-
-## Dark Mode
-
-Dark mode support is prepared but commented out in `tokens.css`. To enable:
-
-1. Uncomment the `@media (prefers-color-scheme: dark)` block in `tokens.css`
-2. Or implement a manual toggle by adding a `.dark` class to `<html>` and updating the selector
-
-```css
-/* Automatic dark mode */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --color-text-primary: var(--color-neutral-100);
-    --color-bg-primary: var(--color-neutral-900);
-    /* ... */
-  }
-}
-
-/* Manual toggle */
-html.dark {
-  --color-text-primary: var(--color-neutral-100);
-  --color-bg-primary: var(--color-neutral-900);
-  /* ... */
-}
-```
-
-## Browser Support
-
-This starter uses modern CSS features supported in all evergreen browsers:
-
-- CSS Custom Properties (variables)
-- CSS Grid and Flexbox
-- `aspect-ratio`
-- `gap` in flexbox
-- `:focus-visible`
-
-For older browser support, consider using PostCSS with appropriate plugins.
+## Available Blocks
+
+| Block | Description | Astro Component |
+|-------|-------------|-----------------|
+| `hero1` | Hero section with optional media | `Hero1.astro` |
+| `cta1` | Centered call-to-action | `CTA1.astro` |
+| `cta2` | Two-column CTA with image | `CTA2.astro` |
+| `feature1` | Features grid with cards | `Feature1.astro` |
+| `layout1` | Two-column content with media/code | `Layout1.astro` |
+| `stats1` | Statistics/metrics display | `Stats1.astro` |
+| `team1` | Team members grid | `Team1.astro` |
+| `blog1` | Blog posts grid (latest, by category, or specific) | `Blog1.astro` |
+| `categoryGrid1` | Category cards grid | `CategoryGrid1.astro` |
+| `section` | Rich text content section | `Section.astro` |
+
+### Common Block Props
+
+All blocks support these styling options:
+- `size`: sm | md | lg (overall vertical padding)
+- `paddingTop` / `paddingBottom`: none | sm | md | lg (override individual padding)
+- `background`: default | muted | primary | dark
+
+## Content Workflow
+
+### Building Pages
+
+1. **Create a Page** in Payload Admin → Content → Pages
+2. **Add Blocks** using the visual block editor
+3. **Configure** each block's content and styling options
+4. **Use Live Preview** to see changes in real-time
+5. **Publish** when ready (change status from Draft to Published)
+6. **View** at the root URL `/your-slug` or `/p/your-slug`
+
+### Managing Navigation
+
+1. Go to Settings → Site Navigation in Payload Admin
+2. Add header and footer navigation items
+3. Link to internal pages or custom URLs
+4. Changes reflect immediately on the frontend
+
+### Blog Posts
+
+- Create posts in Content → Posts
+- Assign categories and authors
+- Rich text content with Lexical editor
+- Support for hero images and SEO metadata
+
+## Routes
+
+| Route | Description |
+|-------|-------------|
+| `/` | Homepage (page with slug "home") |
+| `/[slug]` | Dynamic pages from Payload CMS |
+| `/p/[slug]` | Alternative route for Payload pages |
+| `/blog` | Blog listing page |
+| `/blog/[slug]` | Individual blog posts |
+| `/category/[slug]` | Posts filtered by category |
+| `/preview/*` | Live preview routes (draft content) |
+| `/404` | Custom 404 page |
 
 ## Commands
 
-| Command             | Action                                       |
-| :------------------ | :------------------------------------------- |
-| `npm install`       | Install dependencies                         |
-| `npm run dev`       | Start dev server at `localhost:4321`         |
-| `npm run build`     | Build production site to `./dist/`           |
-| `npm run preview`   | Preview production build locally             |
-| `npm run astro ...` | Run Astro CLI commands                       |
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start Astro dev server |
+| `npm run dev:payload` | Start Payload CMS |
+| `npm run dev:astro` | Start Astro (alias) |
+| `npm run build` | Build Astro for production |
+| `npm run build:payload` | Build Payload for production |
+| `npm run preview` | Preview Astro production build |
+
+### Payload-Specific Commands
+
+Run these from `apps/payload-cms/`:
+
+| Command | Description |
+|---------|-------------|
+| `npm run generate:types` | Regenerate TypeScript types from collections |
+| `npm run seed` | Run database seed script |
+
+## Environment Variables
+
+### Astro (`apps/astro/.env`)
+
+```env
+PAYLOAD_URL=http://localhost:3000
+```
+
+### Payload CMS (`apps/payload-cms/.env`)
+
+```env
+# Database (required)
+MONGODB_URI=mongodb+srv://user:password@cluster.mongodb.net/payload-cms
+
+# Security (required - min 32 characters)
+PAYLOAD_SECRET=your-super-secret-key-here-min-32-chars
+
+# URLs
+PAYLOAD_PUBLIC_SERVER_URL=http://localhost:3000
+ASTRO_URL=http://localhost:4321
+
+# Port (optional, defaults to 3000)
+PORT=3000
+```
+
+## Deployment
+
+### Astro Frontend (Vercel/Netlify/Cloudflare)
+
+1. Set the build command: `npm run build`
+2. Set the output directory: `apps/astro/dist`
+3. Configure environment variable: `PAYLOAD_URL` pointing to your Payload server
+
+Note: The Astro app uses SSR for CMS pages, so ensure your hosting platform supports server-side rendering (Vercel with Node.js runtime, Netlify with serverless functions, etc.)
+
+### Payload CMS (Railway/Render/Fly.io)
+
+1. Build command: `npm run build:payload`
+2. Start command: `npm run start` (in apps/payload-cms)
+3. Configure environment variables:
+   - `MONGODB_URI` - Your MongoDB Atlas connection string
+   - `PAYLOAD_SECRET` - Secure secret key (32+ characters)
+   - `PAYLOAD_PUBLIC_SERVER_URL` - Your deployed Payload URL
+   - `ASTRO_URL` - Your deployed Astro URL (for CORS and live preview)
+
+### Database (MongoDB Atlas)
+
+MongoDB Atlas is the recommended database solution:
+
+1. Create a free M0 cluster at [MongoDB Atlas](https://www.mongodb.com/atlas)
+2. Configure network access for your deployment platform
+3. Use the connection string in `MONGODB_URI`
+
+Alternatively, uncomment the docker-compose.yml services for local MongoDB.
+
+## Adding New Blocks
+
+Creating a new block involves four connected parts: a Payload block definition, an Astro component, the BlockRenderer mapping, and TypeScript types.
+
+### Quick Start
+
+1. **Create the Payload block** in `apps/payload-cms/src/blocks/MyBlock.ts`:
+
+   ```typescript
+   import type { Block } from 'payload';
+   import { sectionFields } from './shared';
+
+   export const MyBlock: Block = {
+     slug: 'myBlock',
+     labels: { singular: 'My Block', plural: 'My Blocks' },
+     fields: [
+       { name: 'heading', type: 'text', required: true },
+       { name: 'description', type: 'textarea' },
+       // Add more fields as needed...
+       ...sectionFields, // Adds size, padding, background options
+     ],
+   };
+   ```
+
+2. **Register the block** in `apps/payload-cms/src/blocks/index.ts`:
+
+   ```typescript
+   export { MyBlock } from './MyBlock';
+   import { MyBlock } from './MyBlock';
+   
+   export const allBlocks = [
+     // ...existing blocks
+     MyBlock,
+   ];
+   ```
+
+3. **Add TypeScript types** in `apps/astro/src/lib/payload.ts`:
+
+   ```typescript
+   export interface MyBlock extends BaseBlock {
+     blockType: 'myBlock';
+     heading: string;
+     description?: string;
+   }
+   
+   // Add to PayloadBlock union
+   export type PayloadBlock = /* ... */ | MyBlock;
+   ```
+
+4. **Add render case** in `apps/astro/src/components/BlockRenderer.astro`:
+
+   ```astro
+   case 'myBlock': {
+     const myBlock = block as MyBlock;
+     return (
+       <Section title={myBlock.heading} {...sectionProps}>
+         <p>{myBlock.description}</p>
+       </Section>
+     );
+   }
+   ```
+
+5. **(Optional) Create a dedicated Astro component** in `apps/astro/src/components/organisms/`
+
+### Shared Block Fields
+
+All blocks can use `sectionFields` from `shared.ts` which provides:
+- `size` - Vertical padding (sm | md | lg)
+- `paddingTop` / `paddingBottom` - Override individual padding
+- `background` - Background color (default | muted | primary | dark)
+
+Additional shared fields available:
+- `buttonField` - Array of CTA buttons with label, href, and variant
+
+### Detailed Tutorial
+
+For a comprehensive guide including:
+- Complete step-by-step workflow
+- Full example (Testimonial1Block)
+- Advanced patterns (rich text, data fetching, conditional fields)
+- Best practices and troubleshooting
+
+See **[docs/CREATING-BLOCKS.md](docs/CREATING-BLOCKS.md)**
+
+## Design System
+
+The design system uses vanilla CSS with CSS custom properties (variables) organized in three layers:
+
+1. **Primitive Tokens** - Raw values (colors, spacing scale, font sizes)
+2. **Semantic Tokens** - Purpose-based mapping (`--color-text-primary`)
+3. **Component Tokens** - Component-specific variables with fallbacks
+
+## Documentation
+
+See the `/docs` folder for detailed guides:
+
+| Document | Description |
+|----------|-------------|
+| [CREATING-BLOCKS.md](docs/CREATING-BLOCKS.md) | Complete tutorial for creating new visual page builder blocks |
+| [ATOMIC-DESIGN.md](docs/ATOMIC-DESIGN.md) | Component architecture guidelines (atoms, molecules, organisms) |
+| [CSS-VARIABLES.md](docs/CSS-VARIABLES.md) | Design token reference and customization guide |
+| [CONTRIBUTING.md](docs/CONTRIBUTING.md) | Development workflow and contribution guidelines |
+
+## Live Preview
+
+Payload CMS supports live preview, allowing editors to see changes in real-time:
+
+1. Edit a page or post in Payload Admin
+2. Click the "Live Preview" button in the sidebar
+3. Changes appear instantly in the preview pane
+4. Toggle between Mobile, Tablet, and Desktop breakpoints
+
+Preview URLs:
+- Pages: `/preview/[slug]`
+- Blog posts: `/preview/blog/[slug]`
 
 ## License
 
-MIT License - feel free to use this starter for any project.
-
----
-
-Built with [Astro](https://astro.build)
+MIT License
