@@ -4,8 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "next dev -p 3000",
-    "build": "next build",
+    "generate:importmap": "payload generate:importmap",
+    "dev": "npm run generate:importmap && next dev -p 3000",
+    "build": "npm run generate:importmap && next build",
     "start": "next start -p 3000",
     "generate:types": "payload generate:types",
     "seed": "tsx src/seed/index.ts"
