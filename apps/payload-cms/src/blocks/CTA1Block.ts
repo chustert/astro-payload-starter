@@ -28,7 +28,7 @@ export const CTA1Block: Block = {
     },
     buttonField,
     ...sectionFields.map((field) =>
-      field.name === 'background' && field.type === 'select'
+      'name' in field && field.name === 'background' && field.type === 'select'
         ? { ...field, defaultValue: 'primary' }
         : field
     ),

@@ -43,7 +43,7 @@ export const CTA2Block: Block = {
     },
     buttonField,
     ...sectionFields.map((field) =>
-      field.name === 'background' && field.type === 'select'
+      'name' in field && field.name === 'background' && field.type === 'select'
         ? { ...field, defaultValue: 'muted' }
         : field
     ),
