@@ -88,6 +88,9 @@ npm run dev:astro
 npm run dev:both
 ```
 
+- Note: The Payload dev server automatically runs `payload generate:importmap` before starting to ensure the admin import map exists on fresh clones.
+- Note: `npm run dev:both` is a local development convenience only and is not used in production deployments.
+
 - **Astro Frontend**: http://localhost:4321
 - **Payload Admin**: http://localhost:3000/admin
 
@@ -157,6 +160,37 @@ apps/payload-cms/
 │   │   └── slugField.ts     # Reusable slug field with auto-generation
 │   └── payload.config.ts    # Main Payload configuration
 ```
+
+## Vercel Deployment
+
+This monorepo is best deployed as two separate Vercel projects.
+
+### 1. Astro Frontend (Project A)
+
+- **Root Directory**: `apps/astro`
+- **Framework Preset**: Astro
+- **Build Command**: `npm run build` (or the default Astro build)
+- **Output Directory**: `dist`
+- **Environment Variables**:
+  - `PAYLOAD_URL` = your deployed Payload URL (e.g. `https://your-payload.vercel.app`)
+
+### 2. Payload CMS (Project B)
+
+- **Root Directory**: `apps/payload-cms`
+- **Framework Preset**: Next.js
+- **Build Command**: `npm run build` (or the default Next.js build)
+- **Output Directory**: `.next`
+- **Environment Variables**:
+  - `MONGODB_URI` = your MongoDB Atlas connection string
+  - `PAYLOAD_SECRET` = a strong secret (min 32 chars)
+  - `ASTRO_URL` = your deployed Astro URL (e.g. `https://your-astro.vercel.app`)
+  - `PAYLOAD_PUBLIC_SERVER_URL` = your Payload URL (e.g. `https://your-payload.vercel.app`) if you use it
+
+### Notes
+
+- Keep both projects on the same Git repository, just with different root directories.
+- `npm run dev:both` is local-only; Vercel builds and runs each app independently.
+- Ensure MongoDB Atlas network access allows Vercel’s outbound connections (use the Atlas IP allowlist or `0.0.0.0/0` for development).
 
 ## Available Blocks
 
