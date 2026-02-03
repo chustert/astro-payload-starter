@@ -83,6 +83,11 @@ npm run dev:payload
 npm run dev:astro
 ```
 
+- Or run both in one command:
+```bash
+npm run dev:both
+```
+
 - **Astro Frontend**: http://localhost:4321
 - **Payload Admin**: http://localhost:3000/admin
 
@@ -220,6 +225,7 @@ All blocks support these styling options:
 | `npm run dev` | Start Astro dev server |
 | `npm run dev:payload` | Start Payload CMS |
 | `npm run dev:astro` | Start Astro (alias) |
+| `npm run dev:both` | Start Payload and Astro together |
 | `npm run build` | Build Astro for production |
 | `npm run build:payload` | Build Payload for production |
 | `npm run preview` | Preview Astro production build |
