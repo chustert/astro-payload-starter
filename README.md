@@ -10,7 +10,6 @@ astro-starter/
 │   ├── astro/           # Astro frontend (port 4321)
 │   └── payload-cms/     # Payload CMS backend on Next.js (port 3000)
 ├── docs/                # Additional documentation
-├── docker-compose.yml   # Optional local MongoDB (disabled by default)
 └── package.json         # Workspace configuration
 ```
 
@@ -326,7 +325,7 @@ MongoDB Atlas is the recommended database solution:
 2. Configure network access for your deployment platform
 3. Use the connection string in `MONGODB_URI`
 
-Alternatively, uncomment the docker-compose.yml services for local MongoDB.
+
 
 ## Adding New Blocks
 
