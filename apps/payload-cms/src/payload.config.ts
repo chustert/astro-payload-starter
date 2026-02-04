@@ -2,6 +2,7 @@ import { mongooseAdapter } from '@payloadcms/db-mongodb';
 import { lexicalEditor } from '@payloadcms/richtext-lexical';
 import path from 'path';
 import { buildConfig } from 'payload';
+import type { SharpDependency } from 'payload';
 import sharp from 'sharp';
 import { fileURLToPath } from 'url';
 
@@ -60,7 +61,7 @@ export default buildConfig({
     url: process.env.MONGODB_URI || 'mongodb://localhost:27017/payload-cms',
   }),
 
-  sharp,
+  sharp: ((input, options) => sharp(input, options)) as SharpDependency,
 
   cors: [
     'http://localhost:4321',
