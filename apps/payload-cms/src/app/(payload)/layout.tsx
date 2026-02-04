@@ -6,6 +6,8 @@ import { handleServerFunctions, RootLayout } from '@payloadcms/next/layouts';
 import React from 'react';
 import { importMap } from './admin/importMap';
 
+export const dynamic = 'force-dynamic';
+
 // Import Payload admin CSS
 import '@payloadcms/next/css';
 import './custom.scss';
