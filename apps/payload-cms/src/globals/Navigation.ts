@@ -1,6 +1,9 @@
 import type { Field, GlobalConfig } from 'payload';
 
 // Reusable link fields for navigation items
+type LinkSiblingData = { type?: 'internal' | 'custom' };
+type ValidateArgs = { siblingData?: LinkSiblingData };
+
 const linkFields: Field[] = [
   {
     name: 'type',
@@ -22,7 +25,7 @@ const linkFields: Field[] = [
       condition: (_, siblingData) => siblingData?.type === 'internal',
       description: 'Select a page to link to',
     },
-    validate: (value, { siblingData }) => {
+    validate: (value: unknown, { siblingData }: ValidateArgs) => {
       if (siblingData?.type === 'internal' && !value) {
         return 'Please select a page';
       }
@@ -36,7 +39,7 @@ const linkFields: Field[] = [
       condition: (_, siblingData) => siblingData?.type === 'custom',
       description: 'Enter a custom URL (e.g., "/blog" or "https://example.com")',
     },
-    validate: (value, { siblingData }) => {
+    validate: (value: unknown, { siblingData }: ValidateArgs) => {
       if (siblingData?.type === 'custom' && !value) {
         return 'Please enter a URL';
       }
