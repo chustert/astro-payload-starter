@@ -1,5 +1,6 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
+import vercel from '@astrojs/vercel/serverless';
 import { fileURLToPath } from 'url';
 import path from 'path';
 
@@ -7,8 +8,9 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // https://astro.build/config
 export default defineConfig({
-  // Static output for best performance
-  output: 'static',
+  // Hybrid output: prerender by default, allow server routes for live preview
+  output: 'hybrid',
+  adapter: vercel(),
 
   // Configure site URL for production
   // site: 'https://your-site.com',
