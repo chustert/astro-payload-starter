@@ -14,10 +14,12 @@ import { formatSlug } from '../utilities/formatSlug';
  *   slugField('title'),
  * ]
  */
+type TextField = Extract<Field, { type: 'text' }>;
+
 export const slugField = (
   fieldToUse: string = 'title',
-  overrides?: Partial<Field>
-): Field => ({
+  overrides?: Partial<TextField>
+): TextField => ({
   name: 'slug',
   type: 'text',
   unique: true,
