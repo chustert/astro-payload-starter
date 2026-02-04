@@ -11,6 +11,7 @@
  */
 
 import { getPayload } from 'payload';
+import type { Navigation, Page, Post } from '../payload-types';
 import config from '../payload.config';
 import 'dotenv/config';
 
@@ -58,14 +59,14 @@ const seed = async () => {
       });
 
       if (existing.docs.length > 0) {
-        createdCategories[category.slug] = existing.docs[0].id;
+        createdCategories[category.slug] = String(existing.docs[0].id);
         console.log(`  ✓ Category "${category.name}" already exists`);
       } else {
         const created = await payload.create({
           collection: 'categories',
           data: category,
         });
-        createdCategories[category.slug] = created.id;
+        createdCategories[category.slug] = String(created.id);
         console.log(`  ✓ Created category: ${category.name}`);
       }
     } catch (error) {
@@ -78,7 +79,11 @@ const seed = async () => {
   // =========================================================================
   console.log('\n📝 Creating blog posts...');
 
-  const posts = [
+  type SeedPost = Omit<Post, 'id' | 'createdAt' | 'updatedAt' | '_status'>;
+  type SeedNavigation = Omit<Navigation, 'id' | 'createdAt' | 'updatedAt'>;
+  type SeedPage = Omit<Page, 'id' | 'createdAt' | 'updatedAt' | '_status'>;
+
+  const posts: SeedPost[] = [
     {
       title: 'Getting Started with Astro',
       slug: 'getting-started-with-astro',
@@ -92,19 +97,30 @@ const seed = async () => {
           children: [
             {
               type: 'paragraph',
+              version: 1,
               children: [
-                { type: 'text', text: 'Astro is a modern static site generator that delivers lightning-fast performance with a developer experience you\'ll love.' },
+                {
+                  type: 'text',
+                  text: 'Astro is a modern static site generator that delivers lightning-fast performance with a developer experience you\'ll love.',
+                  version: 1,
+                },
               ],
             },
             {
               type: 'heading',
               tag: 'h2',
-              children: [{ type: 'text', text: 'Why Astro?' }],
+              version: 1,
+              children: [{ type: 'text', text: 'Why Astro?', version: 1 }],
             },
             {
               type: 'paragraph',
+              version: 1,
               children: [
-                { type: 'text', text: 'Astro offers zero JavaScript by default, component islands, content collections, and fast performance out of the box.' },
+                {
+                  type: 'text',
+                  text: 'Astro offers zero JavaScript by default, component islands, content collections, and fast performance out of the box.',
+                  version: 1,
+                },
               ],
             },
           ],
@@ -129,8 +145,13 @@ const seed = async () => {
           children: [
             {
               type: 'paragraph',
+              version: 1,
               children: [
-                { type: 'text', text: 'CSS custom properties (variables) are a powerful tool for building maintainable design systems.' },
+                {
+                  type: 'text',
+                  text: 'CSS custom properties (variables) are a powerful tool for building maintainable design systems.',
+                  version: 1,
+                },
               ],
             },
           ],
@@ -155,8 +176,13 @@ const seed = async () => {
           children: [
             {
               type: 'paragraph',
+              version: 1,
               children: [
-                { type: 'text', text: 'The Astro team has officially released Astro 5.0, marking a significant milestone in the framework\'s evolution.' },
+                {
+                  type: 'text',
+                  text: 'The Astro team has officially released Astro 5.0, marking a significant milestone in the framework\'s evolution.',
+                  version: 1,
+                },
               ],
             },
           ],
@@ -181,8 +207,13 @@ const seed = async () => {
           children: [
             {
               type: 'paragraph',
+              version: 1,
               children: [
-                { type: 'text', text: 'Here are some quick tips to improve your Astro development experience.' },
+                {
+                  type: 'text',
+                  text: 'Here are some quick tips to improve your Astro development experience.',
+                  version: 1,
+                },
               ],
             },
           ],
@@ -223,25 +254,27 @@ const seed = async () => {
   console.log('\n🧭 Setting up navigation...');
 
   try {
+    const navigationData: SeedNavigation = {
+      header: {
+        items: [
+          { label: 'Home', type: 'custom', url: '/' },
+          { label: 'About', type: 'custom', url: '/about' },
+          { label: 'Blog', type: 'custom', url: '/blog' },
+          { label: 'Categories', type: 'custom', url: '/categories' },
+          { label: 'Style Guide', type: 'custom', url: '/style-guide' },
+        ],
+      },
+      footer: {
+        items: [
+          { label: 'Privacy', type: 'custom', url: '/privacy' },
+          { label: 'Terms', type: 'custom', url: '/terms' },
+        ],
+      },
+    };
+
     await payload.updateGlobal({
       slug: 'navigation',
-      data: {
-        header: {
-          items: [
-            { label: 'Home', href: '/' },
-            { label: 'About', href: '/about' },
-            { label: 'Blog', href: '/blog' },
-            { label: 'Categories', href: '/categories' },
-            { label: 'Style Guide', href: '/style-guide' },
-          ],
-        },
-        footer: {
-          items: [
-            { label: 'Privacy', href: '/privacy' },
-            { label: 'Terms', href: '/terms' },
-          ],
-        },
-      },
+      data: navigationData,
     });
     console.log('  ✓ Navigation configured');
   } catch (error) {
@@ -254,7 +287,7 @@ const seed = async () => {
   console.log('\n📄 Creating sample pages...');
 
   // Home Page
-  const homePage = {
+  const homePage: SeedPage = {
     title: 'Home',
     slug: 'home',
     status: 'published',
@@ -315,7 +348,7 @@ const seed = async () => {
   };
 
   // About Page
-  const aboutPage = {
+  const aboutPage: SeedPage = {
     title: 'About Us',
     slug: 'about',
     status: 'published',
@@ -408,7 +441,7 @@ const seed = async () => {
     ],
   };
 
-  const pages = [homePage, aboutPage];
+  const pages: SeedPage[] = [homePage, aboutPage];
 
   for (const page of pages) {
     try {
