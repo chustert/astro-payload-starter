@@ -15,10 +15,17 @@
     "preview": "npm run preview --workspace=apps/astro"
   },
   "dependencies": {
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
     "sass": "^1.80.0"
   },
   "devDependencies": {
     "wait-on": "^7.2.0"
+  },
+  "overrides": {
+    "react-server-dom-webpack": "19.2.4",
+    "react-server-dom-turbopack": "19.2.4",
+    "react-server-dom-parcel": "19.2.4"
   },
   "engines": {
     "node": ">=18.0.0"

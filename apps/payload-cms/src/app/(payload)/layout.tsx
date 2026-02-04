@@ -1,34 +1,12 @@
 /* THIS FILE WAS GENERATED AUTOMATICALLY BY PAYLOAD. */
-import type { ServerFunctionClient } from 'payload';
-
-import config from '@payload-config';
-import { handleServerFunctions, RootLayout } from '@payloadcms/next/layouts';
 import React from 'react';
-import { importMap } from './admin/importMap';
 
 export const dynamic = 'force-dynamic';
-
-// Import Payload admin CSS
-import '@payloadcms/next/css';
-import './custom.scss';
 
 type Args = {
   children: React.ReactNode;
 };
 
-const serverFunctions: ServerFunctionClient = async function (args) {
-  'use server';
-  return handleServerFunctions({
-    ...args,
-    config,
-    importMap,
-  });
-};
-
-const Layout = ({ children }: Args) => (
-  <RootLayout config={config} importMap={importMap} serverFunction={serverFunctions}>
-    {children}
-  </RootLayout>
-);
+const Layout = ({ children }: Args) => <>{children}</>;
 
 export default Layout;
