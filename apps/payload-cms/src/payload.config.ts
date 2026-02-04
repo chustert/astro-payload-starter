@@ -1,6 +1,5 @@
 import { mongooseAdapter } from '@payloadcms/db-mongodb';
 import { lexicalEditor } from '@payloadcms/richtext-lexical';
-import { livePreview } from '@payloadcms/live-preview';
 import path from 'path';
 import { buildConfig } from 'payload';
 import sharp from 'sharp';
